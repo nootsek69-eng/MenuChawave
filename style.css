@@ -49,23 +49,25 @@ body {
     margin-bottom: 1.5rem;
 }
 
-.store-logo {
-    max-width: 250px; /* Adjust size as needed */
-    height: auto;
-    margin-bottom: 1rem;
-    display: inline-block;
+.header-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
 
-.header-content h1 {
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.5px;
+.store-logo-small {
+    height: 70px; /* Adjust size as needed */
+    width: auto;
+    border-radius: 8px; /* Slight curve for a softer look */
 }
 
 .header-content p {
-    font-weight: 300;
-    opacity: 0.9;
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin: 0;
+    opacity: 0.95;
+    text-align: left; /* Align text to left since it's next to the logo */
 }
 
 /* Main Content */
