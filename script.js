@@ -162,7 +162,7 @@ function openProductModal(index) {
     document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
 
     const item = currentFilteredMenu[index];
-    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', note: '' };
+    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
@@ -191,6 +191,37 @@ function openProductModal(index) {
         }
     } else {
         sweetnessContainer.style.display = 'none';
+    }
+
+    // Render Type
+    const typeContainer = document.getElementById('modal-type-container');
+    const typeDiv = document.getElementById('modal-type');
+    if (item.Type) {
+        const opts = item.Type.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            typeContainer.style.display = 'block';
+            typeDiv.innerHTML = opts.map((opt, i) => {
+                const parts = opt.split('+');
+                let name = opt;
+                let price = 0;
+                if(parts.length > 1) {
+                    name = parts[0].trim();
+                    price = parseFloat(parts[1].trim()) || 0;
+                }
+                const displayName = price > 0 ? `${name} (+${price}฿)` : name;
+                return `
+                <label class="pill-label">
+                    <input type="radio" name="type" value="${name}" data-price="${price}" ${i === 0 ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${displayName}</span>
+                </label>
+                `;
+            }).join('');
+            currentProduct.selectedType = opts[0].split('+')[0].trim(); // default
+        } else {
+            typeContainer.style.display = 'none';
+        }
+    } else {
+        typeContainer.style.display = 'none';
     }
 
     // Render Milk
@@ -307,6 +338,33 @@ function editCartItem(index) {
         sweetnessContainer.style.display = 'none';
     }
 
+    // Render Type
+    const typeContainer = document.getElementById('modal-type-container');
+    const typeDiv = document.getElementById('modal-type');
+    if (currentProduct.Type) {
+        const opts = currentProduct.Type.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            typeContainer.style.display = 'block';
+            typeDiv.innerHTML = opts.map((opt) => {
+                const parts = opt.split('+');
+                let name = parts[0].trim();
+                let price = parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+                const displayName = price > 0 ? `${name} (+${price}฿)` : name;
+                const isChecked = currentProduct.selectedType === name;
+                return `
+                <label class="pill-label">
+                    <input type="radio" name="type" value="${name}" data-price="${price}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${displayName}</span>
+                </label>
+                `;
+            }).join('');
+        } else {
+            typeContainer.style.display = 'none';
+        }
+    } else {
+        typeContainer.style.display = 'none';
+    }
+
     // Render Milk
     const milkContainer = document.getElementById('modal-milk-container');
     const milkDiv = document.getElementById('modal-milk');
@@ -393,6 +451,12 @@ function updateModalPrice() {
     if (selectedMilkEl && document.getElementById('modal-milk-container').style.display !== 'none') {
         addonsPrice += parseFloat(selectedMilkEl.dataset.price) || 0;
     }
+
+    // Check Type Price
+    const selectedTypeEl = document.querySelector('input[name="type"]:checked');
+    if (selectedTypeEl && document.getElementById('modal-type-container').style.display !== 'none') {
+        addonsPrice += parseFloat(selectedTypeEl.dataset.price) || 0;
+    }
     
     let total = (basePrice + addonsPrice) * currentProduct.quantity;
     document.getElementById('modal-total-price').textContent = total;
@@ -408,6 +472,16 @@ function addToCart() {
         currentProduct.selectedSweetness = selectedSweetnessEl.value;
     } else {
         currentProduct.selectedSweetness = '';
+    }
+
+    // Get Type
+    const selectedTypeEl = document.querySelector('input[name="type"]:checked');
+    let typePrice = 0;
+    if (selectedTypeEl && document.getElementById('modal-type-container').style.display !== 'none') {
+        currentProduct.selectedType = selectedTypeEl.value;
+        typePrice = parseFloat(selectedTypeEl.dataset.price) || 0;
+    } else {
+        currentProduct.selectedType = '';
     }
 
     // Get Milk
@@ -428,7 +502,7 @@ function addToCart() {
         addonsTotalPrice += parseFloat(cb.dataset.price) || 0;
     });
     currentProduct.selectedAddons = addons;
-    currentProduct.addonsPrice = addonsTotalPrice + milkPrice;
+    currentProduct.addonsPrice = addonsTotalPrice + milkPrice + typePrice;
 
     // Get Note
     currentProduct.note = document.getElementById('modal-note').value.trim();
@@ -487,6 +561,7 @@ function renderCart() {
         totalPrice += item.itemTotal;
         
         let optionsText = [];
+        if (item.selectedType) optionsText.push(`รูปแบบ: ${item.selectedType}`);
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
         if (item.selectedMilk) optionsText.push(`นม: ${item.selectedMilk}`);
         if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
@@ -572,6 +647,7 @@ function proceedWithOrder() {
         let line = `${item.quantity}x ${item.Name}`;
         
         let details = [];
+        if(item.selectedType) details.push(item.selectedType);
         if(item.selectedSweetness) details.push(item.selectedSweetness);
         if(item.selectedMilk) details.push(item.selectedMilk);
         if(item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
