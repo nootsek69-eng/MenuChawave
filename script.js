@@ -402,7 +402,10 @@ function copyOrder() {
 
     // Copy to clipboard
     navigator.clipboard.writeText(orderText).then(() => {
-        showToast("คัดลอกรายการสั่งซื้อแล้ว! นำไปวางในแชทได้เลย");
+        showToast("คัดลอกแล้ว! กำลังกลับไปที่แชท...");
+        setTimeout(() => {
+            window.close(); // พยายามปิดหน้าต่างอัตโนมัติ (ทำงานได้ในบางเบราว์เซอร์)
+        }, 1500);
     }).catch(err => {
         console.error('Could not copy text: ', err);
         // Fallback for older browsers
@@ -412,7 +415,10 @@ function copyOrder() {
         textArea.select();
         document.execCommand("Copy");
         textArea.remove();
-        showToast("คัดลอกรายการสั่งซื้อแล้ว!");
+        showToast("คัดลอกแล้ว! กด ❌ มุมขวาบนเพื่อกลับไปวางในแชทได้เลย");
+        setTimeout(() => {
+            window.close();
+        }, 2500);
     });
 }
 
