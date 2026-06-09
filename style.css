@@ -57,11 +57,11 @@ body {
 }
 
 .store-logo-small {
-    height: 96px; /* Double the size */
-    width: 96px; /* Make width equal to height for a perfect circle */
+    height: 72px;
+    width: 72px;
     object-fit: cover;
-    border-radius: 50%; /* Make it a perfect circle */
-    border: 2px solid white; /* Add white border */
+    border-radius: 50%;
+    border: 2px solid white;
 }
 
 .header-content p {
