@@ -464,4 +464,18 @@ window.onload = () => {
             }
         });
     }
+
+    // โหลดเบอร์โทรศัพท์จาก LocalStorage
+    const phoneInputEl = document.getElementById('customer-phone');
+    if (phoneInputEl) {
+        const savedPhone = localStorage.getItem('chawave_phone');
+        if (savedPhone) {
+            phoneInputEl.value = savedPhone;
+        }
+
+        // บันทึกเบอร์โทรศัพท์เมื่อมีการพิมพ์
+        phoneInputEl.addEventListener('input', function(e) {
+            localStorage.setItem('chawave_phone', e.target.value.trim());
+        });
+    }
 };
