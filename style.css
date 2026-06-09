@@ -58,8 +58,9 @@ body {
 
 .store-logo-small {
     height: 35px; /* Size slightly larger than text */
-    width: auto;
-    border-radius: 4px; /* Slightly softer edges */
+    width: 35px; /* Make width equal to height for a perfect circle */
+    object-fit: cover;
+    border-radius: 50%; /* Make it a perfect circle */
 }
 
 .header-content p {
