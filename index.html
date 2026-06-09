@@ -21,17 +21,20 @@
     </header>
 
     <main class="main-content">
-        <!-- Search Bar -->
-        <div class="search-wrapper" id="search-wrapper">
-            <input type="text" id="search-input" class="search-input" placeholder="ค้นหาเมนู (พิมพ์ 3 ตัวอักษรขึ้นไป)...">
-            <button class="search-toggle-btn" id="search-toggle-btn" aria-label="Search">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-
-        <!-- Categories filter -->
-        <div class="category-nav" id="category-nav">
-            <!-- Categories will be injected here -->
+        <!-- Controls: Category Dropdown & Search Bar -->
+        <div class="controls-container">
+            <div class="category-wrapper">
+                <select id="category-select" class="category-select" onchange="filterCategory(this.value)">
+                    <!-- Options will be injected here -->
+                </select>
+            </div>
+            
+            <div class="search-wrapper" id="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="ค้นหาเมนู (พิมพ์ 3 ตัวอักษรขึ้นไป)...">
+                <button class="search-toggle-btn" id="search-toggle-btn" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
         </div>
 
         <div class="menu-container" id="menu-container">

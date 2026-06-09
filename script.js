@@ -68,11 +68,13 @@ async function initApp() {
 // ==========================================
 function renderCategories() {
     const categories = ['All', ...new Set(menuData.map(item => item.Category).filter(Boolean))];
-    const nav = document.getElementById('category-nav');
+    const select = document.getElementById('category-select');
     
-    nav.innerHTML = categories.map(cat => 
-        `<button class="cat-btn ${cat === currentCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat === 'All' ? 'ทั้งหมด' : cat}</button>`
-    ).join('');
+    if (select) {
+        select.innerHTML = categories.map(cat => 
+            `<option value="${cat}" ${cat === currentCategory ? 'selected' : ''}>${cat === 'All' ? 'หมวดหมู่: ทั้งหมด' : cat}</option>`
+        ).join('');
+    }
 }
 
 function filterCategory(category) {
