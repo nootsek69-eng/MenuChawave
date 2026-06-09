@@ -200,13 +200,23 @@ function openProductModal(index) {
         const opts = item.Milk.split(/[,|]/).map(s => s.trim()).filter(Boolean);
         if(opts.length > 0) {
             milkContainer.style.display = 'block';
-            milkDiv.innerHTML = opts.map((opt, i) => `
+            milkDiv.innerHTML = opts.map((opt, i) => {
+                const parts = opt.split('+');
+                let name = opt;
+                let price = 0;
+                if(parts.length > 1) {
+                    name = parts[0].trim();
+                    price = parseFloat(parts[1].trim()) || 0;
+                }
+                const displayName = price > 0 ? `${name} (+${price}฿)` : name;
+                return `
                 <label class="pill-label">
-                    <input type="radio" name="milk" value="${opt}" ${i === 0 ? 'checked' : ''} onchange="updateModalPrice()">
-                    <span class="pill-text">${opt}</span>
+                    <input type="radio" name="milk" value="${name}" data-price="${price}" ${i === 0 ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${displayName}</span>
                 </label>
-            `).join('');
-            currentProduct.selectedMilk = opts[0]; // default
+                `;
+            }).join('');
+            currentProduct.selectedMilk = opts[0].split('+')[0].trim(); // default
         } else {
             milkContainer.style.display = 'none';
         }
@@ -305,11 +315,15 @@ function editCartItem(index) {
         if(opts.length > 0) {
             milkContainer.style.display = 'block';
             milkDiv.innerHTML = opts.map((opt) => {
-                const isChecked = currentProduct.selectedMilk === opt;
+                const parts = opt.split('+');
+                let name = parts[0].trim();
+                let price = parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+                const displayName = price > 0 ? `${name} (+${price}฿)` : name;
+                const isChecked = currentProduct.selectedMilk === name;
                 return `
                 <label class="pill-label">
-                    <input type="radio" name="milk" value="${opt}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
-                    <span class="pill-text">${opt}</span>
+                    <input type="radio" name="milk" value="${name}" data-price="${price}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${displayName}</span>
                 </label>
                 `;
             }).join('');
@@ -373,6 +387,12 @@ function updateModalPrice() {
     checkboxes.forEach(cb => {
         addonsPrice += parseFloat(cb.dataset.price) || 0;
     });
+
+    // Check Milk Price
+    const selectedMilkEl = document.querySelector('input[name="milk"]:checked');
+    if (selectedMilkEl && document.getElementById('modal-milk-container').style.display !== 'none') {
+        addonsPrice += parseFloat(selectedMilkEl.dataset.price) || 0;
+    }
     
     let total = (basePrice + addonsPrice) * currentProduct.quantity;
     document.getElementById('modal-total-price').textContent = total;
@@ -392,8 +412,10 @@ function addToCart() {
 
     // Get Milk
     const selectedMilkEl = document.querySelector('input[name="milk"]:checked');
+    let milkPrice = 0;
     if (selectedMilkEl && document.getElementById('modal-milk-container').style.display !== 'none') {
         currentProduct.selectedMilk = selectedMilkEl.value;
+        milkPrice = parseFloat(selectedMilkEl.dataset.price) || 0;
     } else {
         currentProduct.selectedMilk = '';
     }
@@ -406,7 +428,7 @@ function addToCart() {
         addonsTotalPrice += parseFloat(cb.dataset.price) || 0;
     });
     currentProduct.selectedAddons = addons;
-    currentProduct.addonsPrice = addonsTotalPrice;
+    currentProduct.addonsPrice = addonsTotalPrice + milkPrice;
 
     // Get Note
     currentProduct.note = document.getElementById('modal-note').value.trim();
