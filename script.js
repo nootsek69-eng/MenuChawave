@@ -323,7 +323,12 @@ function toggleCart() {
 function copyOrder() {
     if (cart.length === 0) return;
 
+    const phoneInput = document.getElementById('customer-phone').value.trim();
+    
     let orderText = "📝 รายการสั่งซื้อ\n";
+    if (phoneInput) {
+        orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
+    }
     orderText += "------------------------\n";
     
     cart.forEach(item => {

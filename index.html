@@ -56,12 +56,18 @@
         </div>
         
         <div class="cart-footer">
-            <div class="cart-summary">
-                <span class="summary-label">ยอดรวมประมาณ</span>
-                <span class="summary-price"><span id="cart-total-price">0</span> ฿</span>
+            <div class="cart-total">
+                <span>ยอดรวมทั้งหมด:</span>
+                <span class="total-price"><span id="cart-total-price">0</span> ฿</span>
             </div>
-            <button class="action-btn copy-btn" id="copy-btn" onclick="copyOrder()">
-                <i class="fas fa-copy"></i> คัดลอกออเดอร์
+            
+            <div class="customer-info">
+                <label for="customer-phone">เบอร์ติดต่อ:</label>
+                <input type="tel" id="customer-phone" name="phone" autocomplete="tel" placeholder="08x-xxx-xxxx" class="phone-input">
+            </div>
+
+            <button class="checkout-btn" id="copy-btn" onclick="copyOrder()" disabled>
+                <i class="fas fa-copy"></i> คัดลอกรายการสั่งซื้อ
             </button>
         </div>
     </div>
