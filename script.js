@@ -535,6 +535,55 @@ function showToast(message) {
     }, 3000);
 }
 
+// ==========================================
+// ระบบระบุตำแหน่งที่อยู่ (Geolocation)
+// ==========================================
+let userLocationUrl = '';
+
+function toggleLocation(show) {
+    document.getElementById('location-section').style.display = show ? 'block' : 'none';
+    if (!show) {
+        userLocationUrl = ''; // เคลียร์ถ้ากลับไปรับที่ร้าน
+    }
+}
+
+function getLocation() {
+    const status = document.getElementById('location-status');
+    const btn = document.getElementById('get-location-btn');
+    
+    if (!navigator.geolocation) {
+        status.textContent = "เบราว์เซอร์ของคุณไม่รองรับการดึงตำแหน่ง";
+        status.style.color = "red";
+        return;
+    }
+
+    status.textContent = "กำลังค้นหาตำแหน่งของคุณ...";
+    status.style.color = "var(--text-muted)";
+    btn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            userLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
+            
+            status.innerHTML = `<i class="fas fa-check-circle"></i> ปักหมุดสำเร็จ! (ความแม่นยำ ${Math.round(position.coords.accuracy)} เมตร)`;
+            status.style.color = "#10B981";
+            btn.classList.add('success');
+            btn.innerHTML = `<i class="fas fa-check"></i> ดึงตำแหน่งเรียบร้อย`;
+            btn.disabled = false;
+        },
+        (error) => {
+            let msg = "ไม่สามารถดึงตำแหน่งได้";
+            if(error.code === 1) msg = "กรุณาอนุญาตการเข้าถึงตำแหน่งที่ตั้ง";
+            status.textContent = msg;
+            status.style.color = "red";
+            btn.disabled = false;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+}
+
 // เริ่มต้นทำงาน
 window.onload = () => {
     initApp();
