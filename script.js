@@ -72,7 +72,7 @@ function renderCategories() {
     
     if (select) {
         select.innerHTML = categories.map(cat => 
-            `<option value="${cat}" ${cat === currentCategory ? 'selected' : ''}>${cat === 'All' ? 'หมวดหมู่: ทั้งหมด' : cat}</option>`
+            `<option value="${cat}" ${cat === currentCategory ? 'selected' : ''}>${cat === 'All' ? 'ทั้งหมด' : cat}</option>`
         ).join('');
     }
 }
