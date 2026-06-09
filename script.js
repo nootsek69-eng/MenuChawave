@@ -372,11 +372,14 @@ function copyOrder() {
     if (cart.length === 0) return;
 
     const phoneInput = document.getElementById('customer-phone').value.trim();
+    const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
+    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
     
     let orderText = "📝 รายการสั่งซื้อ\n";
     if (phoneInput) {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
     }
+    orderText += `📍 การรับสินค้า: ${deliveryMethod}\n`;
     orderText += "------------------------\n";
     
     cart.forEach(item => {

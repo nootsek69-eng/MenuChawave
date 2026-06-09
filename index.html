@@ -76,6 +76,20 @@
                 <label for="customer-phone">เบอร์ติดต่อ:</label>
                 <input type="tel" id="customer-phone" name="phone" autocomplete="tel" placeholder="08x-xxx-xxxx" class="phone-input">
             </div>
+            
+            <div class="delivery-method">
+                <label>การรับสินค้า:</label>
+                <div class="delivery-options">
+                    <label class="delivery-radio">
+                        <input type="radio" name="delivery_method" value="🚶 เข้าไปรับที่ร้าน" checked>
+                        <span>เข้าไปรับที่ร้าน</span>
+                    </label>
+                    <label class="delivery-radio">
+                        <input type="radio" name="delivery_method" value="🛵 ส่งปลายทาง">
+                        <span>ส่งปลายทาง</span>
+                    </label>
+                </div>
+            </div>
 
             <button class="checkout-btn" id="copy-btn" onclick="copyOrder()" disabled>
                 <i class="fas fa-copy"></i> คัดลอกรายการสั่งซื้อ
