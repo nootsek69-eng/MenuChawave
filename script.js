@@ -357,10 +357,13 @@ function orderHistoryItem(index) {
         return;
     }
 
-    editingCartIndex = -1;
-    currentProduct = JSON.parse(JSON.stringify(item));
-    currentProduct.quantity = 1; // Reset quantity to 1
-    populateModalWithCurrentProduct(false);
+    let productToAdd = JSON.parse(JSON.stringify(item));
+    productToAdd.quantity = 1; // Reset quantity to 1
+    productToAdd.itemTotal = (productToAdd.Price + (productToAdd.addonsPrice || 0)) * productToAdd.quantity;
+    
+    cart.push(productToAdd);
+    renderCart();
+    showToast(`เพิ่ม ${productToAdd.Name} ลงตะกร้าแล้ว`);
 }
 
 function populateModalWithCurrentProduct(isEdit) {
