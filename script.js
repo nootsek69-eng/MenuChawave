@@ -359,9 +359,9 @@ function orderHistoryItem(index) {
 
     let productToAdd = JSON.parse(JSON.stringify(item));
     productToAdd.quantity = 1; // Reset quantity to 1
-    productToAdd.itemTotal = (productToAdd.Price + (productToAdd.addonsPrice || 0)) * productToAdd.quantity;
+    productToAdd.itemTotal = (parseFloat(productToAdd.Price) || 0) + (productToAdd.addonsPrice || 0);
     
-    cart.push(productToAdd);
+    addOrMergeCartItem(productToAdd);
     renderCart();
     showToast(`เพิ่ม ${productToAdd.Name} ลงตะกร้าแล้ว`);
 }
@@ -524,6 +524,24 @@ function updateModalPrice() {
 // ==========================================
 // ระบบตะกร้าสินค้า (Cart)
 // ==========================================
+function addOrMergeCartItem(product) {
+    const existingIndex = cart.findIndex(item => 
+        item.Name === product.Name &&
+        item.selectedType === product.selectedType &&
+        item.selectedSweetness === product.selectedSweetness &&
+        item.selectedMilk === product.selectedMilk &&
+        JSON.stringify(item.selectedAddons || []) === JSON.stringify(product.selectedAddons || []) &&
+        item.note === product.note
+    );
+
+    if (existingIndex > -1) {
+        cart[existingIndex].quantity += product.quantity;
+        const basePrice = parseFloat(cart[existingIndex].Price) || 0;
+        cart[existingIndex].itemTotal = (basePrice + (cart[existingIndex].addonsPrice || 0)) * cart[existingIndex].quantity;
+    } else {
+        cart.push(JSON.parse(JSON.stringify(product)));
+    }
+}
 function addToCart() {
     // Get Sweetness
     const selectedSweetnessEl = document.querySelector('input[name="sweetness"]:checked');
@@ -568,14 +586,14 @@ function addToCart() {
 
     // Calculate Item Total
     const basePrice = parseFloat(currentProduct.Price) || 0;
-    currentProduct.itemTotal = (basePrice + addonsTotalPrice) * currentProduct.quantity;
+    currentProduct.itemTotal = (basePrice + currentProduct.addonsPrice) * currentProduct.quantity;
 
     // Add or Update Cart
     if (editingCartIndex > -1) {
         cart[editingCartIndex] = JSON.parse(JSON.stringify(currentProduct));
         editingCartIndex = -1; // reset
     } else {
-        cart.push(JSON.parse(JSON.stringify(currentProduct)));
+        addOrMergeCartItem(currentProduct);
     }
     
     closeModal();
