@@ -632,7 +632,12 @@ textarea:focus {
     display: flex;
     flex-direction: column;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    max-height: 85vh;
+    height: 100dvh;
+    max-height: 100dvh;
+}
+
+.cart-panel:not(.collapsed) {
+    border-radius: 0;
 }
 
 @media (min-width: 768px) {
