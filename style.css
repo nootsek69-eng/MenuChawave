@@ -57,9 +57,9 @@ body {
 }
 
 .store-logo-small {
-    height: 70px; /* Adjust size as needed */
+    height: 35px; /* Size slightly larger than text */
     width: auto;
-    border-radius: 8px; /* Slight curve for a softer look */
+    border-radius: 4px; /* Slightly softer edges */
 }
 
 .header-content p {
