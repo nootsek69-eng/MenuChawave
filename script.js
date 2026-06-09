@@ -393,7 +393,23 @@ window.onload = () => {
     
     // ตั้งค่าระบบค้นหา
     const searchInput = document.getElementById('search-input');
-    if (searchInput) {
+    const searchWrapper = document.getElementById('search-wrapper');
+    const searchToggleBtn = document.getElementById('search-toggle-btn');
+    
+    if (searchToggleBtn && searchWrapper && searchInput) {
+        searchToggleBtn.addEventListener('click', () => {
+            searchWrapper.classList.toggle('active');
+            if (searchWrapper.classList.contains('active')) {
+                searchInput.focus();
+            } else {
+                // ถ้าปิดช่องค้นหา ให้ล้างข้อความและโหลดเมนูใหม่
+                if (searchInput.value.trim().length > 0) {
+                    searchInput.value = '';
+                    renderMenu();
+                }
+            }
+        });
+        
         searchInput.addEventListener('input', function(e) {
             const val = e.target.value.trim();
             if (val.length >= 3 || val.length === 0) {
