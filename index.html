@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chawave Menu & Order</title>
+    <!-- Google Fonts: Prompt for modern Thai typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <img src="logo.jpg" alt="Chawave Logo" class="store-logo" onerror="this.style.display='none'">
+            <p>เลือกเมนูและสั่งออเดอร์ได้เลยครับ</p>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Categories filter -->
+        <div class="category-nav" id="category-nav">
+            <!-- Categories will be injected here -->
+        </div>
+
+        <div class="menu-container" id="menu-container">
+            <!-- Menu Items will be injected here -->
+            <div class="loading">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>กำลังโหลดข้อมูลเมนู...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Panel (Bottom on Mobile, Sidebar on Desktop) -->
+    <div class="cart-panel collapsed" id="cart-panel">
+        <div class="cart-header" onclick="toggleCart()">
+            <div class="cart-header-title">
+                <i class="fas fa-shopping-basket"></i>
+                <h2>รายการที่เลือก (<span id="cart-count">0</span>)</h2>
+            </div>
+            <i class="fas fa-chevron-up" id="cart-toggle-icon"></i>
+        </div>
+        
+        <div class="cart-body">
+            <div class="cart-items" id="cart-items">
+                <!-- Cart Items will be injected here -->
+                <div class="empty-cart">
+                    <i class="fas fa-utensils"></i>
+                    <p>ยังไม่มีรายการในตะกร้า</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cart-footer">
+            <div class="cart-summary">
+                <span class="summary-label">ยอดรวมประมาณ</span>
+                <span class="summary-price"><span id="cart-total-price">0</span> ฿</span>
+            </div>
+            <button class="action-btn copy-btn" id="copy-btn" onclick="copyOrder()">
+                <i class="fas fa-copy"></i> คัดลอกออเดอร์
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Configuration Modal -->
+    <div class="modal-overlay" id="product-modal" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-img-container">
+                <img id="modal-img" src="" alt="Product Image">
+            </div>
+            
+            <div class="modal-body">
+                <h3 id="modal-title" class="product-title">ชื่อเมนู</h3>
+                <p id="modal-base-price" class="product-price">0 ฿</p>
+                
+                <div class="options-section" id="modal-sweetness-container">
+                    <h4><i class="fas fa-cube"></i> ระดับความหวาน <span class="required">*</span></h4>
+                    <div class="pills-group" id="modal-sweetness">
+                        <!-- Sweetness options -->
+                    </div>
+                </div>
+                
+                <div class="options-section" id="modal-addons-container">
+                    <h4><i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)</h4>
+                    <div class="checkbox-group" id="modal-addons">
+                        <!-- Addon options -->
+                    </div>
+                </div>
+
+                <div class="options-section">
+                    <h4><i class="fas fa-comment-dots"></i> หมายเหตุเพิ่มเติม</h4>
+                    <textarea id="modal-note" placeholder="เช่น ไม่ใส่ผัก, แยกน้ำแข็ง, เผ็ดน้อย..."></textarea>
+                </div>
+                
+                <div class="quantity-control-container">
+                    <span>จำนวน</span>
+                    <div class="quantity-control">
+                        <button type="button" class="qty-btn" onclick="changeQuantity(-1)"><i class="fas fa-minus"></i></button>
+                        <span id="modal-quantity" class="qty-display">1</span>
+                        <button type="button" class="qty-btn" onclick="changeQuantity(1)"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="action-btn add-btn" id="modal-add-btn" onclick="addToCart()">
+                    เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">คัดลอกข้อความแล้ว!</div>
+
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
