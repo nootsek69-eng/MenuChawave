@@ -137,7 +137,6 @@ function renderMenu() {
                 <h3 class="product-name">${item.Name}</h3>
                 <div class="product-price">${item.Price} ฿</div>
             </div>
-            <div class="add-icon"><i class="fas fa-plus"></i></div>
         </div>
         `;
     }).join('');

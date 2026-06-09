@@ -303,28 +303,7 @@ body {
     margin-top: auto;
 }
 
-.add-icon {
-    position: absolute;
-    bottom: -10px;
-    right: 10px;
-    background: var(--primary);
-    color: white;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    z-index: 2;
-    font-size: 0.8rem;
-}
 
-.product-card:hover .add-icon {
-    transform: scale(1.1);
-    background: var(--primary-dark);
-}
 
 /* Modal */
 .modal-overlay {
