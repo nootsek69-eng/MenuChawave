@@ -506,24 +506,14 @@ function proceedWithOrder() {
     navigator.clipboard.writeText(orderText).catch(e => console.log('Clipboard fallback failed', e));
 
     // ส่งข้อความไปที่ LINE
-    // ถ้ามี LINE Official Account ให้ใส่ไอดีตรงนี้ เช่น "@chawave"
-    const LINE_OA_ID = "@720cvcjz"; 
-    
-    let lineUrl = "";
-    if (LINE_OA_ID) {
-        // ส่งตรงเข้าแชทร้าน
-        lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(orderText)}`;
-    } else {
-        // เปิดหน้าส่งข้อความ (ต้องเลือกแชท)
-        lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(orderText)}`;
-    }
+    // เนื่องจากระบบบางเครื่อง (โดยเฉพาะ iOS) บล็อกการใส่ข้อความอัตโนมัติเข้าแชท OA โดยตรง
+    // เราจะใช้หน้าจอ Share แทน ซึ่งจะดึงข้อความไปวางให้ 100% (ลูกค้าแค่จิ้มเลือกชื่อร้านแล้วส่ง)
+    const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(orderText)}`;
     
     showToast("กำลังเปิดแชท LINE...");
     
-    // หน่วงเวลาเล็กน้อยก่อนเด้งไป LINE
-    setTimeout(() => {
-        window.location.href = lineUrl;
-    }, 500);
+    // เปิด LINE ทันที (ไม่ใช้ setTimeout เพื่อป้องกันเบราว์เซอร์บล็อกการเปลี่ยนหน้าเว็บ)
+    window.location.href = lineUrl;
 }
 
 function showToast(message) {
