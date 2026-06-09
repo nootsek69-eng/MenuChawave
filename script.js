@@ -453,6 +453,16 @@ function copyOrder() {
     if (cart.length === 0) return;
 
     const phoneInput = document.getElementById('customer-phone').value.trim();
+    
+    // ตรวจสอบเบอร์โทรศัพท์สำหรับสะสมแต้ม
+    if (!phoneInput) {
+        const confirmNoPoints = confirm("คุณยังไม่ได้กรอกเบอร์โทรศัพท์\nคุณต้องการยืนยันการสั่งออเดอร์โดยไม่สะสมแต้ม ใช่หรือไม่?");
+        if (!confirmNoPoints) {
+            // ถ้ายกเลิก ให้อยู่หน้าเดิม ไม่ส่งต่อ
+            return;
+        }
+    }
+
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
     const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
     
