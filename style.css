@@ -932,3 +932,35 @@ textarea:focus {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
+
+/* Location Button */
+.location-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.location-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.location-btn.success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #10B981;
+    color: #10B981;
+}
+.location-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

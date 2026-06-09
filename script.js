@@ -479,6 +479,9 @@ function proceedWithOrder() {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
     }
     orderText += `📍 การรับสินค้า: ${deliveryMethod}\n`;
+    if (deliveryMethod === '🛵 ส่งปลายทาง' && userLocationUrl) {
+        orderText += `📌 แผนที่จัดส่ง: ${userLocationUrl}\n`;
+    }
     orderText += "------------------------\n";
     
     cart.forEach(item => {

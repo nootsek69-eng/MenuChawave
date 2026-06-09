@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <header class="app-header">
@@ -81,14 +81,22 @@
                 <label>การรับสินค้า:</label>
                 <div class="delivery-options">
                     <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="🚶 เข้าไปรับที่ร้าน" checked>
+                        <input type="radio" name="delivery_method" value="🚶 เข้าไปรับที่ร้าน" onchange="toggleLocation(false)" checked>
                         <span>เข้าไปรับที่ร้าน</span>
                     </label>
                     <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="🛵 ส่งปลายทาง">
+                        <input type="radio" name="delivery_method" value="🛵 ส่งปลายทาง" onchange="toggleLocation(true)">
                         <span>ส่งปลายทาง</span>
                     </label>
                 </div>
+            </div>
+
+            <div class="location-section" id="location-section" style="display: none; margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 500;">ตำแหน่งจัดส่ง:</label>
+                <button type="button" class="location-btn" id="get-location-btn" onclick="getLocation()">
+                    <i class="fas fa-map-marker-alt"></i> กดเพื่อปักหมุดที่อยู่ปัจจุบัน
+                </button>
+                <div id="location-status" class="location-status" style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-muted);"></div>
             </div>
 
             <button class="checkout-btn" id="copy-btn" onclick="copyOrder()" disabled>
@@ -164,6 +172,6 @@
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
