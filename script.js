@@ -89,16 +89,26 @@ function getFilteredMenu() {
     const searchInput = document.getElementById('search-input');
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
     
-    let filtered = menuData;
+    let filtered = [];
     if (currentCategory === '❤️ เมนูโปรด') {
         filtered = menuData.filter(item => favorites.includes(item.Name));
     } else if (currentCategory !== 'All') {
         filtered = menuData.filter(item => item.Category === currentCategory);
+    } else {
+        filtered = [...menuData]; // Copy to avoid mutating original data
     }
     
     if (searchQuery.length >= 3) {
         filtered = filtered.filter(item => item.Name.toLowerCase().includes(searchQuery));
     }
+    
+    // เรียงให้เมนูโปรดขึ้นก่อนเสมอ
+    filtered.sort((a, b) => {
+        const aFav = favorites.includes(a.Name) ? 1 : 0;
+        const bFav = favorites.includes(b.Name) ? 1 : 0;
+        return bFav - aFav;
+    });
+    
     return filtered;
 }
 
