@@ -374,10 +374,10 @@ function addToCart() {
     closeModal();
     renderCart();
     
-    // Open cart automatically on mobile
-    if(window.innerWidth < 768) {
-        document.getElementById('cart-panel').classList.remove('collapsed');
-    }
+    // Open cart automatically on mobile (ปิดไว้ตามคำขอ)
+    // if(window.innerWidth < 768) {
+    //     document.getElementById('cart-panel').classList.remove('collapsed');
+    // }
 }
 
 function removeFromCart(index) {
