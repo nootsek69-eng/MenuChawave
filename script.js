@@ -685,13 +685,13 @@ function closeConfirmModal() {
 function proceedWithOrder() {
     closeConfirmModal(); // ปิด Modal (ถ้าเปิดอยู่)
     
-    // บันทึกประวัติการสั่งซื้อ (เก็บสูงสุด 5 รายการล่าสุด)
+    // บันทึกประวัติการสั่งซื้อ (เก็บสูงสุด 10 รายการล่าสุด)
     if (cart.length > 0) {
         let history = JSON.parse(localStorage.getItem('chawave_history')) || [];
         for (let i = cart.length - 1; i >= 0; i--) {
             history.unshift(cart[i]);
         }
-        history = history.slice(0, 5);
+        history = history.slice(0, 10);
         localStorage.setItem('chawave_history', JSON.stringify(history));
     }
     
