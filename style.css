@@ -578,8 +578,8 @@ textarea:focus {
 .qty-btn {
     background: white;
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -594,38 +594,39 @@ textarea:focus {
     color: white;
 }
 .qty-display {
-    width: 40px;
+    width: 32px;
     text-align: center;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 /* Modal Footer */
 .modal-footer {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem;
     border-top: 1px solid var(--border-color);
     background: white;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     align-items: center;
 }
 
 .action-btn {
     width: 100%;
     flex: 1;
-    padding: 1rem;
+    padding: 0.8rem 0.5rem;
     border: none;
     border-radius: var(--radius-full);
     font-family: inherit;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
+    white-space: nowrap;
 }
 
 .add-btn {
