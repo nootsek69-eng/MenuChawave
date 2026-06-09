@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <header class="app-header">
@@ -143,11 +143,27 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content" style="max-width: 320px; text-align: center; padding: 2rem 1.5rem;">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #F59E0B; margin-bottom: 1rem;"></i>
+            <h3 style="margin-bottom: 0.5rem;">แจ้งเตือนสะสมแต้ม</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                คุณยังไม่ได้กรอกเบอร์โทรศัพท์<br>
+                ต้องการยืนยันออเดอร์โดยไม่สะสมแต้ม ใช่หรือไม่?
+            </p>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="action-btn" onclick="closeConfirmModal()" style="background: var(--bg-color); color: var(--text-main); font-size: 1rem; padding: 0.75rem;">กลับไปกรอก</button>
+                <button class="action-btn" onclick="proceedWithOrder()" style="background: var(--primary); color: white; font-size: 1rem; padding: 0.75rem;">ยืนยันออเดอร์</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="toast">คัดลอกข้อความแล้ว!</div>
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

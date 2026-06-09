@@ -456,13 +456,21 @@ function copyOrder() {
     
     // ตรวจสอบเบอร์โทรศัพท์สำหรับสะสมแต้ม
     if (!phoneInput) {
-        const confirmNoPoints = confirm("คุณยังไม่ได้กรอกเบอร์โทรศัพท์\nคุณต้องการยืนยันการสั่งออเดอร์โดยไม่สะสมแต้ม ใช่หรือไม่?");
-        if (!confirmNoPoints) {
-            // ถ้ายกเลิก ให้อยู่หน้าเดิม ไม่ส่งต่อ
-            return;
-        }
+        document.getElementById('confirm-modal').classList.add('active');
+        return; // รอให้ผู้ใช้กดปุ่มใน Modal
     }
 
+    proceedWithOrder();
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').classList.remove('active');
+}
+
+function proceedWithOrder() {
+    closeConfirmModal(); // ปิด Modal (ถ้าเปิดอยู่)
+    
+    const phoneInput = document.getElementById('customer-phone').value.trim();
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
     const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
     
