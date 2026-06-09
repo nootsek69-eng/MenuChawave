@@ -397,7 +397,7 @@ function renderCart() {
     if (cart.length === 0) {
         cartItems.innerHTML = `
             <div class="empty-cart">
-                <i class="fas fa-utensils"></i>
+                <i class="fas fa-glass-water"></i>
                 <p>ยังไม่มีรายการในตะกร้า</p>
             </div>`;
         cartCount.textContent = '0';
