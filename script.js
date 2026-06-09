@@ -400,26 +400,28 @@ function copyOrder() {
 
     orderText += "------------------------\n";
 
-    // Copy to clipboard
-    navigator.clipboard.writeText(orderText).then(() => {
-        showToast("คัดลอกแล้ว! กำลังกลับไปที่แชท...");
-        setTimeout(() => {
-            window.close(); // พยายามปิดหน้าต่างอัตโนมัติ (ทำงานได้ในบางเบราว์เซอร์)
-        }, 1500);
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
-        // Fallback for older browsers
-        const textArea = document.createElement("textarea");
-        textArea.value = orderText;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("Copy");
-        textArea.remove();
-        showToast("คัดลอกแล้ว! กด ❌ มุมขวาบนเพื่อกลับไปวางในแชทได้เลย");
-        setTimeout(() => {
-            window.close();
-        }, 2500);
-    });
+    // Copy to clipboard as a backup
+    navigator.clipboard.writeText(orderText).catch(e => console.log('Clipboard fallback failed', e));
+
+    // ส่งข้อความไปที่ LINE
+    // ถ้ามี LINE Official Account ให้ใส่ไอดีตรงนี้ เช่น "@chawave"
+    const LINE_OA_ID = ""; 
+    
+    let lineUrl = "";
+    if (LINE_OA_ID) {
+        // ส่งตรงเข้าแชทร้าน
+        lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(orderText)}`;
+    } else {
+        // เปิดหน้าส่งข้อความ (ต้องเลือกแชท)
+        lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(orderText)}`;
+    }
+    
+    showToast("กำลังเปิดแชท LINE...");
+    
+    // หน่วงเวลาเล็กน้อยก่อนเด้งไป LINE
+    setTimeout(() => {
+        window.location.href = lineUrl;
+    }, 500);
 }
 
 function showToast(message) {
