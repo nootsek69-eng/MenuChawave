@@ -256,6 +256,31 @@ body {
     transform: scale(1.05);
 }
 
+.fav-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.85);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    z-index: 2;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.fav-icon:hover {
+    transform: scale(1.1);
+}
+.fav-icon.active {
+    color: #EF4444;
+}
+
 .product-info {
     padding: 0.5rem;
     display: flex;

@@ -15,6 +15,7 @@ const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1v
 let menuData = [];
 let currentFilteredMenu = [];
 let cart = [];
+let favorites = JSON.parse(localStorage.getItem('chawave_favorites')) || [];
 let currentCategory = 'All';
 let currentProduct = null;
 
@@ -67,7 +68,8 @@ async function initApp() {
 // การแสดงผลเมนู (Render UI)
 // ==========================================
 function renderCategories() {
-    const categories = ['All', ...new Set(menuData.map(item => item.Category).filter(Boolean))];
+    let categories = [...new Set(menuData.map(item => item.Category).filter(Boolean))];
+    categories = ['All', '❤️ เมนูโปรด', ...categories]; // Add Favorites category
     const select = document.getElementById('category-select');
     
     if (select) {
@@ -87,7 +89,12 @@ function getFilteredMenu() {
     const searchInput = document.getElementById('search-input');
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
     
-    let filtered = currentCategory === 'All' ? menuData : menuData.filter(item => item.Category === currentCategory);
+    let filtered = menuData;
+    if (currentCategory === '❤️ เมนูโปรด') {
+        filtered = menuData.filter(item => favorites.includes(item.Name));
+    } else if (currentCategory !== 'All') {
+        filtered = menuData.filter(item => item.Category === currentCategory);
+    }
     
     if (searchQuery.length >= 3) {
         filtered = filtered.filter(item => item.Name.toLowerCase().includes(searchQuery));
@@ -106,10 +113,14 @@ function renderMenu() {
 
     container.innerHTML = currentFilteredMenu.map((item, index) => {
         const defaultImg = 'logo.jpg';
+        const isFav = favorites.includes(item.Name);
         return `
         <div class="product-card" onclick="openProductModal(${index})">
             <div class="product-img-wrapper">
                 <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
+                <div class="fav-icon ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.Name.replace(/'/g, "\\'")}', event)">
+                    <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                </div>
             </div>
             <div class="product-info">
                 <h3 class="product-name">${item.Name}</h3>
@@ -119,6 +130,18 @@ function renderMenu() {
         </div>
         `;
     }).join('');
+}
+
+function toggleFavorite(name, event) {
+    event.stopPropagation(); // Prevent opening modal
+    const index = favorites.indexOf(name);
+    if (index > -1) {
+        favorites.splice(index, 1);
+    } else {
+        favorites.push(name);
+    }
+    localStorage.setItem('chawave_favorites', JSON.stringify(favorites));
+    renderMenu(); // Re-render to update heart icons and potentially remove from list if in favorites tab
 }
 
 // ==========================================
