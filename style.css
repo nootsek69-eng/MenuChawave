@@ -41,7 +41,7 @@ body {
 .app-header {
     background: var(--primary); /* Use exact logo color instead of gradient to blend */
     color: white;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
     text-align: center;
     box-shadow: var(--shadow-md);
     border-bottom-left-radius: 30px;
