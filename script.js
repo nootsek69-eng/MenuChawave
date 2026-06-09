@@ -13,6 +13,7 @@ const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1v
 // ตัวแปรระบบ (State)
 // ==========================================
 let menuData = [];
+let currentFilteredMenu = [];
 let cart = [];
 let currentCategory = 'All';
 let currentProduct = null;
@@ -80,16 +81,28 @@ function filterCategory(category) {
     renderMenu();
 }
 
+function getFilteredMenu() {
+    const searchInput = document.getElementById('search-input');
+    const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    
+    let filtered = currentCategory === 'All' ? menuData : menuData.filter(item => item.Category === currentCategory);
+    
+    if (searchQuery.length >= 3) {
+        filtered = filtered.filter(item => item.Name.toLowerCase().includes(searchQuery));
+    }
+    return filtered;
+}
+
 function renderMenu() {
     const container = document.getElementById('menu-container');
-    const filteredMenu = currentCategory === 'All' ? menuData : menuData.filter(item => item.Category === currentCategory);
+    currentFilteredMenu = getFilteredMenu();
     
-    if (filteredMenu.length === 0) {
+    if (currentFilteredMenu.length === 0) {
         container.innerHTML = '<p class="loading">ไม่พบรายการเมนู</p>';
         return;
     }
 
-    container.innerHTML = filteredMenu.map((item, index) => {
+    container.innerHTML = currentFilteredMenu.map((item, index) => {
         const defaultImg = 'logo.jpg';
         return `
         <div class="product-card" onclick="openProductModal(${index})">
@@ -110,7 +123,7 @@ function renderMenu() {
 // ระบบ Modal (ตั้งค่าสินค้าก่อนลงตะกร้า)
 // ==========================================
 function openProductModal(index) {
-    const item = currentCategory === 'All' ? menuData[index] : menuData.filter(i => i.Category === currentCategory)[index];
+    const item = currentFilteredMenu[index];
     currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
@@ -375,4 +388,17 @@ function showToast(message) {
 }
 
 // เริ่มต้นทำงาน
-window.onload = initApp;
+window.onload = () => {
+    initApp();
+    
+    // ตั้งค่าระบบค้นหา
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            if (val.length >= 3 || val.length === 0) {
+                renderMenu();
+            }
+        });
+    }
+};
