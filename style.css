@@ -568,11 +568,12 @@ textarea:focus {
 }
 
 .quantity-control {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     background: var(--bg-color);
     border-radius: var(--radius-full);
     padding: 0.25rem;
+    flex-shrink: 0;
 }
 
 .qty-btn {
