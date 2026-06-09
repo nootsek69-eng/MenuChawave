@@ -418,5 +418,14 @@ window.onload = () => {
                 renderMenu();
             }
         });
+        
+        // ย่อช่องค้นหากลับเมื่อคลิกที่อื่น (ถ้าไม่ได้พิมพ์อะไรไว้)
+        document.addEventListener('click', (e) => {
+            if (!searchWrapper.contains(e.target) && searchWrapper.classList.contains('active')) {
+                if (searchInput.value.trim() === '') {
+                    searchWrapper.classList.remove('active');
+                }
+            }
+        });
     }
 };
