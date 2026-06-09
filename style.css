@@ -96,7 +96,7 @@ body {
     justify-content: flex-end;
     position: relative;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: 0;
 }
 .search-toggle-btn {
     background: var(--card-bg);
