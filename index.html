@@ -128,17 +128,14 @@
                     <textarea id="modal-note" placeholder="เช่น แยกน้ำแข็ง, ไม่เอาหลอด, หวานปกติ..."></textarea>
                 </div>
                 
-                <div class="quantity-control-container">
-                    <span>จำนวน</span>
-                    <div class="quantity-control">
-                        <button type="button" class="qty-btn" onclick="changeQuantity(-1)"><i class="fas fa-minus"></i></button>
-                        <span id="modal-quantity" class="qty-display">1</span>
-                        <button type="button" class="qty-btn" onclick="changeQuantity(1)"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
             </div>
             
             <div class="modal-footer">
+                <div class="quantity-control">
+                    <button type="button" class="qty-btn" onclick="changeQuantity(-1)"><i class="fas fa-minus"></i></button>
+                    <span id="modal-quantity" class="qty-display">1</span>
+                    <button type="button" class="qty-btn" onclick="changeQuantity(1)"><i class="fas fa-plus"></i></button>
+                </div>
                 <button class="action-btn add-btn" id="modal-add-btn" onclick="addToCart()">
                     เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿
                 </button>

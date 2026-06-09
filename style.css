@@ -606,10 +606,14 @@ textarea:focus {
     border-top: 1px solid var(--border-color);
     background: white;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .action-btn {
     width: 100%;
+    flex: 1;
     padding: 1rem;
     border: none;
     border-radius: var(--radius-full);
