@@ -162,7 +162,7 @@ function openProductModal(index) {
     document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
 
     const item = currentFilteredMenu[index];
-    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', note: '' };
+    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
@@ -191,6 +191,27 @@ function openProductModal(index) {
         }
     } else {
         sweetnessContainer.style.display = 'none';
+    }
+
+    // Render Milk
+    const milkContainer = document.getElementById('modal-milk-container');
+    const milkDiv = document.getElementById('modal-milk');
+    if (item.Milk) {
+        const opts = item.Milk.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            milkContainer.style.display = 'block';
+            milkDiv.innerHTML = opts.map((opt, i) => `
+                <label class="pill-label">
+                    <input type="radio" name="milk" value="${opt}" ${i === 0 ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${opt}</span>
+                </label>
+            `).join('');
+            currentProduct.selectedMilk = opts[0]; // default
+        } else {
+            milkContainer.style.display = 'none';
+        }
+    } else {
+        milkContainer.style.display = 'none';
     }
 
     // Render Addons
@@ -276,6 +297,29 @@ function editCartItem(index) {
         sweetnessContainer.style.display = 'none';
     }
 
+    // Render Milk
+    const milkContainer = document.getElementById('modal-milk-container');
+    const milkDiv = document.getElementById('modal-milk');
+    if (currentProduct.Milk) {
+        const opts = currentProduct.Milk.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            milkContainer.style.display = 'block';
+            milkDiv.innerHTML = opts.map((opt) => {
+                const isChecked = currentProduct.selectedMilk === opt;
+                return `
+                <label class="pill-label">
+                    <input type="radio" name="milk" value="${opt}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${opt}</span>
+                </label>
+                `;
+            }).join('');
+        } else {
+            milkContainer.style.display = 'none';
+        }
+    } else {
+        milkContainer.style.display = 'none';
+    }
+
     // Render Addons
     const addonsContainer = document.getElementById('modal-addons-container');
     const addonsDiv = document.getElementById('modal-addons');
@@ -346,6 +390,14 @@ function addToCart() {
         currentProduct.selectedSweetness = '';
     }
 
+    // Get Milk
+    const selectedMilkEl = document.querySelector('input[name="milk"]:checked');
+    if (selectedMilkEl && document.getElementById('modal-milk-container').style.display !== 'none') {
+        currentProduct.selectedMilk = selectedMilkEl.value;
+    } else {
+        currentProduct.selectedMilk = '';
+    }
+
     // Get Addons
     const addons = [];
     let addonsTotalPrice = 0;
@@ -414,6 +466,7 @@ function renderCart() {
         
         let optionsText = [];
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
+        if (item.selectedMilk) optionsText.push(`นม: ${item.selectedMilk}`);
         if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
         
         return `
@@ -498,6 +551,7 @@ function proceedWithOrder() {
         
         let details = [];
         if(item.selectedSweetness) details.push(item.selectedSweetness);
+        if(item.selectedMilk) details.push(item.selectedMilk);
         if(item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
         if(item.note) details.push(`หมายเหตุ: ${item.note}`);
         
