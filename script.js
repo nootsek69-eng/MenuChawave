@@ -401,6 +401,8 @@ function renderCart() {
                 <p>ยังไม่มีรายการในตะกร้า</p>
             </div>`;
         cartCount.textContent = '0';
+        cartCount.style.color = '';
+        cartCount.style.fontWeight = '';
         cartTotalPrice.textContent = '0';
         copyBtn.disabled = true;
         return;
@@ -436,6 +438,13 @@ function renderCart() {
     }).join('');
 
     cartCount.textContent = totalItems;
+    if (totalItems > 0) {
+        cartCount.style.color = '#EF4444';
+        cartCount.style.fontWeight = 'bold';
+    } else {
+        cartCount.style.color = '';
+        cartCount.style.fontWeight = '';
+    }
     cartTotalPrice.textContent = totalPrice;
     copyBtn.disabled = false;
 }
