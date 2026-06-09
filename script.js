@@ -90,7 +90,7 @@ function renderMenu() {
     }
 
     container.innerHTML = filteredMenu.map((item, index) => {
-        const defaultImg = 'https://via.placeholder.com/500x500?text=No+Image';
+        const defaultImg = 'logo.jpg';
         return `
         <div class="product-card" onclick="openProductModal(${index})">
             <div class="product-img-wrapper">
@@ -115,7 +115,8 @@ function openProductModal(index) {
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
-    document.getElementById('modal-img').src = item.Image || 'https://via.placeholder.com/500x500?text=No+Image';
+    document.getElementById('modal-img').src = item.Image || 'logo.jpg';
+    document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = '1';
     document.getElementById('modal-note').value = '';
 
