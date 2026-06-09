@@ -786,17 +786,22 @@ textarea:focus {
     font-weight: 600;
     color: var(--primary);
 }
-.remove-btn {
+.remove-btn, .edit-btn {
     background: none;
     border: none;
-    color: #EF4444;
     cursor: pointer;
     font-size: 0.9rem;
     padding: 0.25rem;
     opacity: 0.7;
     transition: var(--transition);
 }
-.remove-btn:hover {
+.remove-btn {
+    color: #EF4444;
+}
+.edit-btn {
+    color: #3B82F6; /* สีน้ำเงินสำหรับการแก้ไข */
+}
+.remove-btn:hover, .edit-btn:hover {
     opacity: 1;
 }
 

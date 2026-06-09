@@ -18,6 +18,7 @@ let cart = [];
 let favorites = JSON.parse(localStorage.getItem('chawave_favorites')) || [];
 let currentCategory = 'All';
 let currentProduct = null;
+let editingCartIndex = -1;
 
 // ==========================================
 // การดึงข้อมูล (Fetch Data)
@@ -158,6 +159,9 @@ function toggleFavorite(name, event) {
 // ระบบ Modal (ตั้งค่าสินค้าก่อนลงตะกร้า)
 // ==========================================
 function openProductModal(index) {
+    editingCartIndex = -1;
+    document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
+
     const item = currentFilteredMenu[index];
     currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', note: '' };
     
@@ -238,6 +242,76 @@ function closeModalOnOutsideClick(event) {
     }
 }
 
+function editCartItem(index) {
+    editingCartIndex = index;
+    const item = cart[index];
+    currentProduct = JSON.parse(JSON.stringify(item));
+    
+    document.getElementById('modal-title').textContent = currentProduct.Name;
+    document.getElementById('modal-base-price').textContent = `${currentProduct.Price} ฿`;
+    document.getElementById('modal-img').src = currentProduct.Image || 'logo.jpg';
+    document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
+    document.getElementById('modal-quantity').textContent = currentProduct.quantity;
+    document.getElementById('modal-note').value = currentProduct.note || '';
+
+    // Render Sweetness
+    const sweetnessContainer = document.getElementById('modal-sweetness-container');
+    const sweetnessDiv = document.getElementById('modal-sweetness');
+    if (currentProduct.Sweetness) {
+        const opts = currentProduct.Sweetness.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            sweetnessContainer.style.display = 'block';
+            sweetnessDiv.innerHTML = opts.map((opt) => {
+                const isChecked = currentProduct.selectedSweetness === opt;
+                return `
+                <label class="pill-label">
+                    <input type="radio" name="sweetness" value="${opt}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${opt}</span>
+                </label>
+                `;
+            }).join('');
+        } else {
+            sweetnessContainer.style.display = 'none';
+        }
+    } else {
+        sweetnessContainer.style.display = 'none';
+    }
+
+    // Render Addons
+    const addonsContainer = document.getElementById('modal-addons-container');
+    const addonsDiv = document.getElementById('modal-addons');
+    if (currentProduct.Addons) {
+        const opts = currentProduct.Addons.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            addonsContainer.style.display = 'block';
+            addonsDiv.innerHTML = opts.map((opt) => {
+                const parts = opt.split('+');
+                let name = parts[0].trim();
+                let price = parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+                const isChecked = currentProduct.selectedAddons && currentProduct.selectedAddons.includes(name);
+                return `
+                <label class="checkbox-label">
+                    <div class="addon-info">
+                        <input type="checkbox" value="${name}" data-price="${price}" onchange="updateModalPrice()" ${isChecked ? 'checked' : ''}>
+                        <span>${name}</span>
+                    </div>
+                    ${price > 0 ? `<span class="addon-price">+${price} ฿</span>` : ''}
+                </label>
+                `;
+            }).join('');
+        } else {
+            addonsContainer.style.display = 'none';
+        }
+    } else {
+        addonsContainer.style.display = 'none';
+    }
+
+    document.getElementById('modal-add-btn').innerHTML = 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿';
+    
+    updateModalPrice();
+    document.getElementById('product-modal').classList.add('active');
+}
+
 function changeQuantity(delta) {
     let q = currentProduct.quantity + delta;
     if (q >= 1) {
@@ -290,8 +364,13 @@ function addToCart() {
     const basePrice = parseFloat(currentProduct.Price) || 0;
     currentProduct.itemTotal = (basePrice + addonsTotalPrice) * currentProduct.quantity;
 
-    // Add to Cart
-    cart.push(JSON.parse(JSON.stringify(currentProduct)));
+    // Add or Update Cart
+    if (editingCartIndex > -1) {
+        cart[editingCartIndex] = JSON.parse(JSON.stringify(currentProduct));
+        editingCartIndex = -1; // reset
+    } else {
+        cart.push(JSON.parse(JSON.stringify(currentProduct)));
+    }
     
     closeModal();
     renderCart();
@@ -348,7 +427,10 @@ function renderCart() {
             </div>
             <div class="item-price-remove">
                 <div class="item-total">${item.itemTotal} ฿</div>
-                <button class="remove-btn" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i> ลบ</button>
+                <div class="action-buttons" style="display: flex; gap: 0.75rem; align-items: center;">
+                    <button class="edit-btn" onclick="editCartItem(${index})"><i class="fas fa-edit"></i> แก้ไข</button>
+                    <button class="remove-btn" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i> ลบ</button>
+                </div>
             </div>
         </div>
         `;
