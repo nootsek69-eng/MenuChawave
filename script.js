@@ -405,7 +405,7 @@ function copyOrder() {
 
     // ส่งข้อความไปที่ LINE
     // ถ้ามี LINE Official Account ให้ใส่ไอดีตรงนี้ เช่น "@chawave"
-    const LINE_OA_ID = ""; 
+    const LINE_OA_ID = "@720cvcjz"; 
     
     let lineUrl = "";
     if (LINE_OA_ID) {
