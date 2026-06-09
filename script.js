@@ -70,7 +70,7 @@ async function initApp() {
 // ==========================================
 function renderCategories() {
     let categories = [...new Set(menuData.map(item => item.Category).filter(Boolean))];
-    categories = ['All', '❤️ เมนูโปรด', ...categories]; // Add Favorites category
+    categories = ['All', '❤️ เมนูโปรด', '🕒 ประวัติล่าสุด', ...categories]; // Add Favorites and History
     const select = document.getElementById('category-select');
     
     if (select) {
@@ -91,7 +91,9 @@ function getFilteredMenu() {
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
     
     let filtered = [];
-    if (currentCategory === '❤️ เมนูโปรด') {
+    if (currentCategory === '🕒 ประวัติล่าสุด') {
+        return []; // handled in renderMenu
+    } else if (currentCategory === '❤️ เมนูโปรด') {
         filtered = menuData.filter(item => favorites.includes(item.Name));
     } else if (currentCategory !== 'All') {
         filtered = menuData.filter(item => item.Category === currentCategory);
@@ -115,6 +117,39 @@ function getFilteredMenu() {
 
 function renderMenu() {
     const container = document.getElementById('menu-container');
+    
+    if (currentCategory === '🕒 ประวัติล่าสุด') {
+        const history = JSON.parse(localStorage.getItem('chawave_history')) || [];
+        if (history.length === 0) {
+            container.innerHTML = '<p class="loading">ยังไม่มีประวัติการสั่งซื้อ</p>';
+            return;
+        }
+        
+        container.innerHTML = history.map((item, index) => {
+            const defaultImg = 'logo.jpg';
+            let optionsText = [];
+            if (item.selectedType) optionsText.push(item.selectedType);
+            if (item.selectedSweetness) optionsText.push(item.selectedSweetness);
+            if (item.selectedMilk) optionsText.push(item.selectedMilk);
+            if (item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(item.selectedAddons.join(', '));
+            
+            return `
+            <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
+                <div class="product-img-wrapper">
+                    <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${item.Name}</h3>
+                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">${optionsText.join(' | ')}</div>
+                    <div class="product-price">${item.itemTotal / item.quantity} ฿</div>
+                    <button class="add-btn" style="width: 100%; margin-top: 5px;" onclick="orderHistoryItem(${index}); event.stopPropagation();"><i class="fas fa-redo"></i> สั่งอีกครั้ง</button>
+                </div>
+            </div>
+            `;
+        }).join('');
+        return;
+    }
+
     currentFilteredMenu = getFilteredMenu();
     
     if (currentFilteredMenu.length === 0) {
@@ -307,7 +342,28 @@ function editCartItem(index) {
     editingCartIndex = index;
     const item = cart[index];
     currentProduct = JSON.parse(JSON.stringify(item));
+    populateModalWithCurrentProduct(true);
+}
+
+function orderHistoryItem(index) {
+    const history = JSON.parse(localStorage.getItem('chawave_history')) || [];
+    const item = history[index];
+    if (!item) return;
     
+    // Find base item to verify it still exists
+    const baseItemIndex = menuData.findIndex(m => m.Name === item.Name);
+    if (baseItemIndex === -1) {
+        alert("ไม่พบเมนูนี้ในระบบแล้ว");
+        return;
+    }
+
+    editingCartIndex = -1;
+    currentProduct = JSON.parse(JSON.stringify(item));
+    currentProduct.quantity = 1; // Reset quantity to 1
+    populateModalWithCurrentProduct(false);
+}
+
+function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-title').textContent = currentProduct.Name;
     document.getElementById('modal-base-price').textContent = `${currentProduct.Price} ฿`;
     document.getElementById('modal-img').src = currentProduct.Image || 'logo.jpg';
@@ -421,7 +477,7 @@ function editCartItem(index) {
         addonsContainer.style.display = 'none';
     }
 
-    document.getElementById('modal-add-btn').innerHTML = 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿';
+    document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
     
     updateModalPrice();
     document.getElementById('product-modal').classList.add('active');
@@ -628,6 +684,16 @@ function closeConfirmModal() {
 
 function proceedWithOrder() {
     closeConfirmModal(); // ปิด Modal (ถ้าเปิดอยู่)
+    
+    // บันทึกประวัติการสั่งซื้อ (เก็บสูงสุด 5 รายการล่าสุด)
+    if (cart.length > 0) {
+        let history = JSON.parse(localStorage.getItem('chawave_history')) || [];
+        for (let i = cart.length - 1; i >= 0; i--) {
+            history.unshift(cart[i]);
+        }
+        history = history.slice(0, 5);
+        localStorage.setItem('chawave_history', JSON.stringify(history));
+    }
     
     const phoneInput = document.getElementById('customer-phone').value.trim();
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
