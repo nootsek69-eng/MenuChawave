@@ -803,7 +803,9 @@ let userLocationUrl = '';
 
 function toggleLocation(show) {
     document.getElementById('location-section').style.display = show ? 'block' : 'none';
-    if (!show) {
+    if (show) {
+        getLocation();
+    } else {
         userLocationUrl = ''; // เคลียร์ถ้ากลับไปรับที่ร้าน
     }
 }
@@ -815,11 +817,13 @@ function getLocation() {
     if (!navigator.geolocation) {
         status.textContent = "เบราว์เซอร์ของคุณไม่รองรับการดึงตำแหน่ง";
         status.style.color = "red";
+        btn.style.display = 'block';
         return;
     }
 
     status.textContent = "กำลังค้นหาตำแหน่งของคุณ...";
     status.style.color = "var(--text-muted)";
+    btn.style.display = 'none'; // ซ่อนปุ่มระหว่างค้นหา
     btn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(
@@ -832,14 +836,14 @@ function getLocation() {
             if (distance > MAX_DELIVERY_DISTANCE_KM) {
                 status.innerHTML = `<i class="fas fa-times-circle"></i> อยู่นอกระยะให้บริการ (${distance.toFixed(1)} กม.) รองรับไม่เกิน ${MAX_DELIVERY_DISTANCE_KM} กม.`;
                 status.style.color = "red";
+                btn.style.display = 'block'; // แสดงปุ่มให้ลองใหม่
                 btn.disabled = false;
                 userLocationUrl = '';
             } else {
                 userLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
-                status.innerHTML = `<i class="fas fa-check-circle"></i> ปักหมุดสำเร็จ! ระยะทาง ${distance.toFixed(1)} กม.`;
+                status.innerHTML = `<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ! ระยะทาง ${distance.toFixed(1)} กม.`;
                 status.style.color = "#10B981";
-                btn.classList.add('success');
-                btn.innerHTML = `<i class="fas fa-check"></i> ดึงตำแหน่งเรียบร้อย`;
+                btn.style.display = 'none'; // ซ่อนปุ่มถาวรถ้าสำเร็จ
                 btn.disabled = false;
             }
         },
@@ -848,6 +852,7 @@ function getLocation() {
             if(error.code === 1) msg = "กรุณาอนุญาตการเข้าถึงตำแหน่งที่ตั้ง";
             status.textContent = msg;
             status.style.color = "red";
+            btn.style.display = 'block'; // แสดงปุ่มให้ลองใหม่
             btn.disabled = false;
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
