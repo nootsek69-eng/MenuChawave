@@ -35,7 +35,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 // ==========================================
 let menuData = [];
 let currentFilteredMenu = [];
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('chawave_cart')) || [];
 let favorites = JSON.parse(localStorage.getItem('chawave_favorites')) || [];
 let currentCategory = 'All';
 let currentProduct = null;
@@ -634,6 +634,7 @@ function removeFromCart(index) {
 }
 
 function renderCart() {
+    localStorage.setItem('chawave_cart', JSON.stringify(cart));
     const cartCount = document.getElementById('cart-count');
     const cartItems = document.getElementById('cart-items');
     const cartTotalPrice = document.getElementById('cart-total-price');
@@ -783,6 +784,10 @@ function proceedWithOrder() {
     
     showToast("คัดลอกแล้ว! กรุณากด 'วาง' ในแชทเพื่อส่ง");
     
+    // เคลียร์ตะกร้าเมื่อส่งสำเร็จ
+    cart = [];
+    renderCart();
+    
     // เปิด LINE ทันที (ไม่ใช้ setTimeout เพื่อป้องกันเบราว์เซอร์บล็อกการเปลี่ยนหน้าเว็บ)
     window.location.href = lineUrl;
 }
@@ -862,6 +867,7 @@ function getLocation() {
 // เริ่มต้นทำงาน
 window.onload = () => {
     initApp();
+    renderCart(); // โหลดตะกร้าที่บันทึกไว้
     
     // ตั้งค่าระบบค้นหา
     const searchInput = document.getElementById('search-input');
