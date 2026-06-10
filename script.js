@@ -7,6 +7,27 @@
 // 4. นำลิงก์ที่ได้มาวางในตัวแปรด้านล่างนี้
 const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7NsP46-2fr6vidSjW2BO6YGkKgdhUXlxuqEBNqpcJ4jrqE9roD-KILJXBa1EHZEDkXhhw5Q8NodZR/pub?gid=0&single=true&output=csv"; 
 
+// ==========================================
+// การตั้งค่าตำแหน่งร้าน (พิกัด ละติจูด, ลองจิจูด)
+// ==========================================
+// แก้ไขพิกัดตรงนี้ให้ตรงกับตำแหน่งร้านจริง (ตัวอย่าง: กรุงเทพฯ)
+const STORE_LAT = 13.7563; 
+const STORE_LNG = 100.5018;
+const MAX_DELIVERY_DISTANCE_KM = 5;
+
+// ฟังก์ชันคำนวณระยะทาง (สูตร Haversine)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // รัศมีโลก (กิโลเมตร)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
 // ข้อมูลจำลอง (Mock Data) ถูกนำออกแล้วตามความต้องการ
 
 // ==========================================
@@ -805,13 +826,22 @@ function getLocation() {
         (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            userLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
             
-            status.innerHTML = `<i class="fas fa-check-circle"></i> ปักหมุดสำเร็จ! (ความแม่นยำ ${Math.round(position.coords.accuracy)} เมตร)`;
-            status.style.color = "#10B981";
-            btn.classList.add('success');
-            btn.innerHTML = `<i class="fas fa-check"></i> ดึงตำแหน่งเรียบร้อย`;
-            btn.disabled = false;
+            const distance = calculateDistance(STORE_LAT, STORE_LNG, lat, lng);
+            
+            if (distance > MAX_DELIVERY_DISTANCE_KM) {
+                status.innerHTML = `<i class="fas fa-times-circle"></i> อยู่นอกระยะให้บริการ (${distance.toFixed(1)} กม.) รองรับไม่เกิน ${MAX_DELIVERY_DISTANCE_KM} กม.`;
+                status.style.color = "red";
+                btn.disabled = false;
+                userLocationUrl = '';
+            } else {
+                userLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                status.innerHTML = `<i class="fas fa-check-circle"></i> ปักหมุดสำเร็จ! ระยะทาง ${distance.toFixed(1)} กม.`;
+                status.style.color = "#10B981";
+                btn.classList.add('success');
+                btn.innerHTML = `<i class="fas fa-check"></i> ดึงตำแหน่งเรียบร้อย`;
+                btn.disabled = false;
+            }
         },
         (error) => {
             let msg = "ไม่สามารถดึงตำแหน่งได้";
