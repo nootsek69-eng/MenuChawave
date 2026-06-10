@@ -156,9 +156,9 @@ function renderMenu() {
             
             return `
             <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
-                <div class="product-img-wrapper">
+                <div class="product-img-wrapper skeleton-loading">
                     ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
-                    <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
+                    <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')" onerror="this.src='${defaultImg}'; this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')">
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">${item.Name}</h3>
@@ -184,9 +184,9 @@ function renderMenu() {
         const isFav = favorites.includes(item.Name);
         return `
         <div class="product-card" onclick="openProductModal(${index})">
-            <div class="product-img-wrapper">
+            <div class="product-img-wrapper skeleton-loading">
                 ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
-                <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
+                <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')" onerror="this.src='${defaultImg}'; this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')">
                 <div class="fav-icon ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.Name.replace(/'/g, "\\'")}', event)">
                     <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
                 </div>

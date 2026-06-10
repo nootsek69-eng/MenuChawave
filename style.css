@@ -258,6 +258,17 @@ body {
     pointer-events: none;
 }
 
+.skeleton-loading {
+    background: linear-gradient(90deg, #e2dfd8 25%, #f0f0f0 50%, #e2dfd8 75%);
+    background-size: 200% 100%;
+    animation: loadingSkeleton 1.5s infinite;
+}
+
+@keyframes loadingSkeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 .product-img {
     position: absolute;
     top: 0;
@@ -265,7 +276,12 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.product-img.loaded {
+    opacity: 1;
 }
 
 .product-card:hover .product-img {
