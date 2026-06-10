@@ -242,6 +242,22 @@ body {
     overflow: hidden;
 }
 
+.promo-ribbon {
+    position: absolute;
+    top: 15px;
+    left: -35px;
+    background-color: #EF4444;
+    color: white;
+    padding: 4px 40px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transform: rotate(-45deg);
+    z-index: 3;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-align: center;
+    pointer-events: none;
+}
+
 .product-img {
     position: absolute;
     top: 0;

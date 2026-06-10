@@ -136,6 +136,7 @@ function renderMenu() {
             return `
             <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
                 <div class="product-img-wrapper">
+                    ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
                     <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
                 </div>
                 <div class="product-info">
@@ -163,6 +164,7 @@ function renderMenu() {
         return `
         <div class="product-card" onclick="openProductModal(${index})">
             <div class="product-img-wrapper">
+                ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
                 <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" onerror="this.src='${defaultImg}'">
                 <div class="fav-icon ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.Name.replace(/'/g, "\\'")}', event)">
                     <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
