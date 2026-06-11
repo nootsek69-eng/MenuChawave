@@ -221,7 +221,7 @@ function openProductModal(index) {
     document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
 
     const item = currentFilteredMenu[index];
-    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: 'ใส่แก้ว', note: '' };
+    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: '', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
@@ -230,8 +230,26 @@ function openProductModal(index) {
     document.getElementById('modal-quantity').textContent = '1';
     document.getElementById('modal-note').value = '';
     
-    const defaultCup = document.querySelector('input[name="cup_option"][value="ใส่แก้ว"]');
-    if (defaultCup) defaultCup.checked = true;
+    // Render Cup Option
+    const cupContainer = document.getElementById('modal-cup-container');
+    const cupDiv = document.getElementById('modal-cup');
+    if (item.CupOption) {
+        const opts = item.CupOption.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            cupContainer.style.display = 'block';
+            cupDiv.innerHTML = opts.map((opt, i) => `
+                <label class="pill-label">
+                    <input type="radio" name="cup_option" value="${opt}" ${i === 0 ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${opt}</span>
+                </label>
+            `).join('');
+            currentProduct.selectedCup = opts[0]; // default
+        } else {
+            cupContainer.style.display = 'none';
+        }
+    } else {
+        cupContainer.style.display = 'none';
+    }
 
     // Render Sweetness
     const sweetnessContainer = document.getElementById('modal-sweetness-container');
@@ -401,9 +419,28 @@ function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-quantity').textContent = currentProduct.quantity;
     document.getElementById('modal-note').value = currentProduct.note || '';
 
-    const cupOption = currentProduct.selectedCup || 'ใส่แก้ว';
-    const cupRadio = document.querySelector(`input[name="cup_option"][value="${cupOption}"]`);
-    if (cupRadio) cupRadio.checked = true;
+    // Render Cup Option
+    const cupContainer = document.getElementById('modal-cup-container');
+    const cupDiv = document.getElementById('modal-cup');
+    if (currentProduct.CupOption) {
+        const opts = currentProduct.CupOption.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            cupContainer.style.display = 'block';
+            cupDiv.innerHTML = opts.map((opt) => {
+                const isChecked = currentProduct.selectedCup === opt;
+                return `
+                <label class="pill-label">
+                    <input type="radio" name="cup_option" value="${opt}" ${isChecked ? 'checked' : ''} onchange="updateModalPrice()">
+                    <span class="pill-text">${opt}</span>
+                </label>
+                `;
+            }).join('');
+        } else {
+            cupContainer.style.display = 'none';
+        }
+    } else {
+        cupContainer.style.display = 'none';
+    }
 
     // Render Sweetness
     const sweetnessContainer = document.getElementById('modal-sweetness-container');
@@ -605,7 +642,11 @@ function addToCart() {
 
     // Get Cup Option
     const selectedCupEl = document.querySelector('input[name="cup_option"]:checked');
-    currentProduct.selectedCup = selectedCupEl ? selectedCupEl.value : 'ใส่แก้ว';
+    if (selectedCupEl && document.getElementById('modal-cup-container').style.display !== 'none') {
+        currentProduct.selectedCup = selectedCupEl.value;
+    } else {
+        currentProduct.selectedCup = '';
+    }
 
     // Get Addons
     const addons = [];
