@@ -152,6 +152,7 @@ function renderMenu() {
             if (item.selectedType) optionsText.push(item.selectedType);
             if (item.selectedSweetness) optionsText.push(item.selectedSweetness);
             if (item.selectedMilk) optionsText.push(item.selectedMilk);
+            if (item.selectedCup) optionsText.push(item.selectedCup);
             if (item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(item.selectedAddons.join(', '));
             
             return `
@@ -220,7 +221,7 @@ function openProductModal(index) {
     document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
 
     const item = currentFilteredMenu[index];
-    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', note: '' };
+    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: 'ใส่แก้ว', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
@@ -228,6 +229,9 @@ function openProductModal(index) {
     document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = '1';
     document.getElementById('modal-note').value = '';
+    
+    const defaultCup = document.querySelector('input[name="cup_option"][value="ใส่แก้ว"]');
+    if (defaultCup) defaultCup.checked = true;
 
     // Render Sweetness
     const sweetnessContainer = document.getElementById('modal-sweetness-container');
@@ -397,6 +401,10 @@ function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-quantity').textContent = currentProduct.quantity;
     document.getElementById('modal-note').value = currentProduct.note || '';
 
+    const cupOption = currentProduct.selectedCup || 'ใส่แก้ว';
+    const cupRadio = document.querySelector(`input[name="cup_option"][value="${cupOption}"]`);
+    if (cupRadio) cupRadio.checked = true;
+
     // Render Sweetness
     const sweetnessContainer = document.getElementById('modal-sweetness-container');
     const sweetnessDiv = document.getElementById('modal-sweetness');
@@ -553,6 +561,7 @@ function addOrMergeCartItem(product) {
         item.selectedType === product.selectedType &&
         item.selectedSweetness === product.selectedSweetness &&
         item.selectedMilk === product.selectedMilk &&
+        item.selectedCup === product.selectedCup &&
         JSON.stringify(item.selectedAddons || []) === JSON.stringify(product.selectedAddons || []) &&
         item.note === product.note
     );
@@ -593,6 +602,10 @@ function addToCart() {
     } else {
         currentProduct.selectedMilk = '';
     }
+
+    // Get Cup Option
+    const selectedCupEl = document.querySelector('input[name="cup_option"]:checked');
+    currentProduct.selectedCup = selectedCupEl ? selectedCupEl.value : 'ใส่แก้ว';
 
     // Get Addons
     const addons = [];
@@ -665,6 +678,7 @@ function renderCart() {
         if (item.selectedType) optionsText.push(`รูปแบบ: ${item.selectedType}`);
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
         if (item.selectedMilk) optionsText.push(`นม: ${item.selectedMilk}`);
+        if (item.selectedCup) optionsText.push(`การรับ: ${item.selectedCup}`);
         if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
         
         return `
@@ -761,6 +775,7 @@ function proceedWithOrder() {
         if(item.selectedType) details.push(item.selectedType);
         if(item.selectedSweetness) details.push(item.selectedSweetness);
         if(item.selectedMilk) details.push(item.selectedMilk);
+        if(item.selectedCup) details.push(item.selectedCup);
         if(item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
         if(item.note) details.push(`หมายเหตุ: ${item.note}`);
         
