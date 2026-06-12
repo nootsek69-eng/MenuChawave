@@ -221,7 +221,7 @@ function openProductModal(index) {
     document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
 
     const item = currentFilteredMenu[index];
-    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: '', note: '' };
+    currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSauce: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: '', note: '' };
     
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
@@ -229,6 +229,18 @@ function openProductModal(index) {
     document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = '1';
     document.getElementById('modal-note').value = '';
+
+    // Dynamic Labels based on Category
+    const typeLabel = document.querySelector('#modal-type-container h4');
+    const addonsLabel = document.querySelector('#modal-addons-container h4');
+    
+    if (item.Category === 'ขนม') {
+        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
+        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
+    } else {
+        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
+        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
+    }
     
     // Render Cup Option
     const cupContainer = document.getElementById('modal-cup-container');
@@ -369,6 +381,34 @@ function openProductModal(index) {
         addonsContainer.style.display = 'none';
     }
 
+    // Render Sauce
+    const sauceContainer = document.getElementById('modal-sauce-container');
+    const sauceDiv = document.getElementById('modal-sauce');
+    if (item.Sauce) {
+        const opts = item.Sauce.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            sauceContainer.style.display = 'block';
+            sauceDiv.innerHTML = opts.map((opt) => {
+                const parts = opt.split('+');
+                let name = parts[0].trim();
+                let price = parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+                return `
+                <label class="checkbox-label">
+                    <div class="addon-info">
+                        <input type="checkbox" name="sauce" value="${name}" data-price="${price}" onchange="updateSauceSelection(); updateModalPrice()">
+                        <span>${name}</span>
+                    </div>
+                    ${price > 0 ? `<span class="addon-price">+${price} ฿</span>` : ''}
+                </label>
+                `;
+            }).join('');
+        } else {
+            sauceContainer.style.display = 'none';
+        }
+    } else {
+        sauceContainer.style.display = 'none';
+    }
+
     updateModalPrice();
     document.getElementById('product-modal').classList.add('active');
 }
@@ -418,6 +458,18 @@ function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = currentProduct.quantity;
     document.getElementById('modal-note').value = currentProduct.note || '';
+
+    // Dynamic Labels based on Category
+    const typeLabel = document.querySelector('#modal-type-container h4');
+    const addonsLabel = document.querySelector('#modal-addons-container h4');
+    
+    if (currentProduct.Category === 'ขนม') {
+        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
+        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
+    } else {
+        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
+        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
+    }
 
     // Render Cup Option
     const cupContainer = document.getElementById('modal-cup-container');
@@ -548,6 +600,36 @@ function populateModalWithCurrentProduct(isEdit) {
         addonsContainer.style.display = 'none';
     }
 
+    // Render Sauce
+    const sauceContainer = document.getElementById('modal-sauce-container');
+    const sauceDiv = document.getElementById('modal-sauce');
+    if (currentProduct.Sauce) {
+        const opts = currentProduct.Sauce.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+        if(opts.length > 0) {
+            sauceContainer.style.display = 'block';
+            sauceDiv.innerHTML = opts.map((opt) => {
+                const parts = opt.split('+');
+                let name = parts[0].trim();
+                let price = parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+                const isChecked = currentProduct.selectedSauce && currentProduct.selectedSauce.includes(name);
+                return `
+                <label class="checkbox-label">
+                    <div class="addon-info">
+                        <input type="checkbox" name="sauce" value="${name}" data-price="${price}" onchange="updateSauceSelection(); updateModalPrice()" ${isChecked ? 'checked' : ''}>
+                        <span>${name}</span>
+                    </div>
+                    ${price > 0 ? `<span class="addon-price">+${price} ฿</span>` : ''}
+                </label>
+                `;
+            }).join('');
+            setTimeout(updateSauceSelection, 0);
+        } else {
+            sauceContainer.style.display = 'none';
+        }
+    } else {
+        sauceContainer.style.display = 'none';
+    }
+
     document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
     
     updateModalPrice();
@@ -563,10 +645,28 @@ function changeQuantity(delta) {
     }
 }
 
+function updateSauceSelection() {
+    const checked = document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked');
+    const checkboxes = document.querySelectorAll('#modal-sauce input[type="checkbox"]');
+    if (checked.length >= 2) {
+        checkboxes.forEach(cb => {
+            if (!cb.checked) cb.disabled = true;
+        });
+    } else {
+        checkboxes.forEach(cb => cb.disabled = false);
+    }
+}
+
 function updateModalPrice() {
     let basePrice = parseFloat(currentProduct.Price) || 0;
     let addonsPrice = 0;
     
+    // Check Sauce
+    const sauceCheckboxes = document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked');
+    sauceCheckboxes.forEach(cb => {
+        addonsPrice += parseFloat(cb.dataset.price) || 0;
+    });
+
     // Check Addons
     const checkboxes = document.querySelectorAll('#modal-addons input[type="checkbox"]:checked');
     checkboxes.forEach(cb => {
@@ -600,6 +700,7 @@ function addOrMergeCartItem(product) {
         item.selectedMilk === product.selectedMilk &&
         item.selectedCup === product.selectedCup &&
         JSON.stringify(item.selectedAddons || []) === JSON.stringify(product.selectedAddons || []) &&
+        JSON.stringify(item.selectedSauce || []) === JSON.stringify(product.selectedSauce || []) &&
         item.note === product.note
     );
 
@@ -656,7 +757,24 @@ function addToCart() {
         addonsTotalPrice += parseFloat(cb.dataset.price) || 0;
     });
     currentProduct.selectedAddons = addons;
-    currentProduct.addonsPrice = addonsTotalPrice + milkPrice + typePrice;
+
+    // Get Sauce
+    const sauce = [];
+    let sauceTotalPrice = 0;
+    document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked').forEach(cb => {
+        sauce.push(cb.value);
+        sauceTotalPrice += parseFloat(cb.dataset.price) || 0;
+    });
+    
+    if (document.getElementById('modal-sauce-container').style.display !== 'none') {
+        if (sauce.length === 0) {
+            alert('กรุณาเลือกซอสอย่างน้อย 1 อย่าง (เลือกได้สูงสุด 2 อย่าง)');
+            return;
+        }
+    }
+    
+    currentProduct.selectedSauce = sauce;
+    currentProduct.addonsPrice = addonsTotalPrice + sauceTotalPrice + milkPrice + typePrice;
 
     // Get Note
     currentProduct.note = document.getElementById('modal-note').value.trim();
@@ -720,6 +838,7 @@ function renderCart() {
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
         if (item.selectedMilk) optionsText.push(`นม: ${item.selectedMilk}`);
         if (item.selectedCup) optionsText.push(`การรับ: ${item.selectedCup}`);
+        if (item.selectedSauce && item.selectedSauce.length > 0) optionsText.push(`ซอส: ${item.selectedSauce.join(', ')}`);
         if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
         
         return `
