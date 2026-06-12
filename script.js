@@ -234,7 +234,8 @@ function openProductModal(index) {
     const typeLabel = document.querySelector('#modal-type-container h4');
     const addonsLabel = document.querySelector('#modal-addons-container h4');
     
-    if (item.Category === 'ขนม') {
+    const isDessert = (item.Group === 'ขนม') || (!item.Group && item.Category === 'ขนม');
+    if (isDessert) {
         if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
         if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
     } else {
@@ -463,7 +464,8 @@ function populateModalWithCurrentProduct(isEdit) {
     const typeLabel = document.querySelector('#modal-type-container h4');
     const addonsLabel = document.querySelector('#modal-addons-container h4');
     
-    if (currentProduct.Category === 'ขนม') {
+    const isDessert = (currentProduct.Group === 'ขนม') || (!currentProduct.Group && currentProduct.Category === 'ขนม');
+    if (isDessert) {
         if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
         if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
     } else {
