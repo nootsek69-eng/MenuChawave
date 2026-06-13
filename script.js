@@ -5,13 +5,18 @@
 // 2. ไปที่ ไฟล์ (File) > แชร์ (Share) > เผยแพร่ทางเว็บ (Publish to web)
 // 3. เลือกแผ่นงานที่ต้องการ และเลือกรูปแบบเป็น "ค่าที่คั่นด้วยจุลภาค (.csv)"
 // 4. นำลิงก์ที่ได้มาวางในตัวแปรด้านล่างนี้
-const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7NsP46-2fr6vidSjW2BO6YGkKgdhUXlxuqEBNqpcJ4jrqE9roD-KILJXBa1EHZEDkXhhw5Q8NodZR/pub?gid=0&single=true&output=csv"; 
+const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7NsP46-2fr6vidSjW2BO6YGkKgdhUXlxuqEBNqpcJ4jrqE9roD-KILJXBa1EHZEDkXhhw5Q8NodZR/pub?gid=0&single=true&output=csv";
+
+// ==========================================
+// ลิงก์ Google Apps Script สำหรับรับออเดอร์เข้า POS
+// ==========================================
+const GOOGLE_SHEETS_SCRIPT_URL = "https://script.google.com/macros/library/d/1XivuFi25oF6rqLO5ce-KO_TKziXPPrx0C-SDgd9DVb5y2LROibOYCDfb/5"; // วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
 
 // ==========================================
 // การตั้งค่าตำแหน่งร้าน (พิกัด ละติจูด, ลองจิจูด)
 // ==========================================
 // แก้ไขพิกัดตรงนี้ให้ตรงกับตำแหน่งร้านจริง
-const STORE_LAT = 14.658342; 
+const STORE_LAT = 14.658342;
 const STORE_LNG = 104.221992;
 const MAX_DELIVERY_DISTANCE_KM = 5;
 
@@ -20,11 +25,11 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // รัศมีโลก (กิโลเมตร)
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
@@ -74,7 +79,7 @@ async function initApp() {
         Papa.parse(csvString, {
             header: true,
             skipEmptyLines: true,
-            complete: function(results) {
+            complete: function (results) {
                 menuData = results.data;
                 renderCategories();
                 renderMenu();
@@ -93,9 +98,9 @@ function renderCategories() {
     let categories = [...new Set(menuData.map(item => item.Category).filter(Boolean))];
     categories = ['All', '❤️ เมนูโปรด', '🕒 ประวัติล่าสุด', ...categories]; // Add Favorites and History
     const select = document.getElementById('category-select');
-    
+
     if (select) {
-        select.innerHTML = categories.map(cat => 
+        select.innerHTML = categories.map(cat =>
             `<option value="${cat}" ${cat === currentCategory ? 'selected' : ''}>${cat === 'All' ? 'ทั้งหมด' : cat}</option>`
         ).join('');
     }
@@ -110,7 +115,7 @@ function filterCategory(category) {
 function getFilteredMenu() {
     const searchInput = document.getElementById('search-input');
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
-    
+
     let filtered = [];
     if (currentCategory === '🕒 ประวัติล่าสุด') {
         return []; // handled in renderMenu
@@ -121,31 +126,31 @@ function getFilteredMenu() {
     } else {
         filtered = [...menuData]; // Copy to avoid mutating original data
     }
-    
+
     if (searchQuery.length >= 3) {
         filtered = filtered.filter(item => item.Name.toLowerCase().includes(searchQuery));
     }
-    
+
     // เรียงให้เมนูโปรดขึ้นก่อนเสมอ
     filtered.sort((a, b) => {
         const aFav = favorites.includes(a.Name) ? 1 : 0;
         const bFav = favorites.includes(b.Name) ? 1 : 0;
         return bFav - aFav;
     });
-    
+
     return filtered;
 }
 
 function renderMenu() {
     const container = document.getElementById('menu-container');
-    
+
     if (currentCategory === '🕒 ประวัติล่าสุด') {
         const history = JSON.parse(localStorage.getItem('chawave_history')) || [];
         if (history.length === 0) {
             container.innerHTML = '<p class="loading">ยังไม่มีประวัติการสั่งซื้อ</p>';
             return;
         }
-        
+
         container.innerHTML = history.map((item, index) => {
             const defaultImg = 'logo.jpg';
             let optionsText = [];
@@ -154,7 +159,7 @@ function renderMenu() {
             if (item.selectedMilk) optionsText.push(item.selectedMilk);
             if (item.selectedCup) optionsText.push(item.selectedCup);
             if (item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(item.selectedAddons.join(', '));
-            
+
             return `
             <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
                 <div class="product-img-wrapper skeleton-loading">
@@ -174,7 +179,7 @@ function renderMenu() {
     }
 
     currentFilteredMenu = getFilteredMenu();
-    
+
     if (currentFilteredMenu.length === 0) {
         container.innerHTML = '<p class="loading">ไม่พบรายการเมนู</p>';
         return;
@@ -222,33 +227,33 @@ function openProductModal(index) {
 
     const item = currentFilteredMenu[index];
     currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSauce: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: '', note: '' };
-    
+
     document.getElementById('modal-title').textContent = item.Name;
     document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
     document.getElementById('modal-img').src = item.Image || 'logo.jpg';
-    document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
+    document.getElementById('modal-img').onerror = function () { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = '1';
     document.getElementById('modal-note').value = '';
 
     // Dynamic Labels based on Category
     const typeLabel = document.querySelector('#modal-type-container h4');
     const addonsLabel = document.querySelector('#modal-addons-container h4');
-    
+
     const isDessert = (item.Group === 'ขนม') || (!item.Group && item.Category === 'ขนม');
     if (isDessert) {
-        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
-        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
+        if (typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
+        if (addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
     } else {
-        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
-        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
+        if (typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
+        if (addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
     }
-    
+
     // Render Cup Option
     const cupContainer = document.getElementById('modal-cup-container');
     const cupDiv = document.getElementById('modal-cup');
     if (item.CupOption) {
         const opts = item.CupOption.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             cupContainer.style.display = 'block';
             cupDiv.innerHTML = opts.map((opt, i) => `
                 <label class="pill-label">
@@ -270,7 +275,7 @@ function openProductModal(index) {
     if (item.Sweetness) {
         // รองรับการคั่นด้วยลูกน้ำ หรือ |
         const opts = item.Sweetness.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             sweetnessContainer.style.display = 'block';
             sweetnessDiv.innerHTML = opts.map((opt, i) => `
                 <label class="pill-label">
@@ -291,13 +296,13 @@ function openProductModal(index) {
     const typeDiv = document.getElementById('modal-type');
     if (item.Type) {
         const opts = item.Type.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             typeContainer.style.display = 'block';
             typeDiv.innerHTML = opts.map((opt, i) => {
                 const parts = opt.split('+');
                 let name = opt;
                 let price = 0;
-                if(parts.length > 1) {
+                if (parts.length > 1) {
                     name = parts[0].trim();
                     price = parseFloat(parts[1].trim()) || 0;
                 }
@@ -322,13 +327,13 @@ function openProductModal(index) {
     const milkDiv = document.getElementById('modal-milk');
     if (item.Milk) {
         const opts = item.Milk.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             milkContainer.style.display = 'block';
             milkDiv.innerHTML = opts.map((opt, i) => {
                 const parts = opt.split('+');
                 let name = opt;
                 let price = 0;
-                if(parts.length > 1) {
+                if (parts.length > 1) {
                     name = parts[0].trim();
                     price = parseFloat(parts[1].trim()) || 0;
                 }
@@ -353,18 +358,18 @@ function openProductModal(index) {
     const addonsDiv = document.getElementById('modal-addons');
     if (item.Addons) {
         const opts = item.Addons.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             addonsContainer.style.display = 'block';
             addonsDiv.innerHTML = opts.map((opt, i) => {
                 // Parse "ไข่มุก +10" หรือ "ไข่มุก 10"
                 const parts = opt.split('+');
                 let name = opt;
                 let price = 0;
-                if(parts.length > 1) {
+                if (parts.length > 1) {
                     name = parts[0].trim();
                     price = parseFloat(parts[1].trim()) || 0;
                 }
-                
+
                 return `
                 <label class="checkbox-label">
                     <div class="addon-info">
@@ -387,7 +392,7 @@ function openProductModal(index) {
     const sauceDiv = document.getElementById('modal-sauce');
     if (item.Sauce) {
         const opts = item.Sauce.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             sauceContainer.style.display = 'block';
             sauceDiv.innerHTML = opts.map((opt) => {
                 const parts = opt.split('+');
@@ -435,7 +440,7 @@ function orderHistoryItem(index) {
     const history = JSON.parse(localStorage.getItem('chawave_history')) || [];
     const item = history[index];
     if (!item) return;
-    
+
     // Find base item to verify it still exists
     const baseItemIndex = menuData.findIndex(m => m.Name === item.Name);
     if (baseItemIndex === -1) {
@@ -446,7 +451,7 @@ function orderHistoryItem(index) {
     let productToAdd = JSON.parse(JSON.stringify(item));
     productToAdd.quantity = 1; // Reset quantity to 1
     productToAdd.itemTotal = (parseFloat(productToAdd.Price) || 0) + (productToAdd.addonsPrice || 0);
-    
+
     addOrMergeCartItem(productToAdd);
     renderCart();
     showToast(`เพิ่ม ${productToAdd.Name} ลงตะกร้าแล้ว`);
@@ -456,21 +461,21 @@ function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-title').textContent = currentProduct.Name;
     document.getElementById('modal-base-price').textContent = `${currentProduct.Price} ฿`;
     document.getElementById('modal-img').src = currentProduct.Image || 'logo.jpg';
-    document.getElementById('modal-img').onerror = function() { this.src = 'logo.jpg'; };
+    document.getElementById('modal-img').onerror = function () { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = currentProduct.quantity;
     document.getElementById('modal-note').value = currentProduct.note || '';
 
     // Dynamic Labels based on Category
     const typeLabel = document.querySelector('#modal-type-container h4');
     const addonsLabel = document.querySelector('#modal-addons-container h4');
-    
+
     const isDessert = (currentProduct.Group === 'ขนม') || (!currentProduct.Group && currentProduct.Category === 'ขนม');
     if (isDessert) {
-        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
-        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
+        if (typeLabel) typeLabel.innerHTML = '<i class="fas fa-list"></i> รูปแบบ <span class="required">*</span>';
+        if (addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> ซอส/ท็อปปิ้ง (Add-ons)';
     } else {
-        if(typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
-        if(addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
+        if (typeLabel) typeLabel.innerHTML = '<i class="fas fa-temperature-half"></i> รูปแบบ (ร้อน/เย็น/ปั่น) <span class="required">*</span>';
+        if (addonsLabel) addonsLabel.innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มท็อปปิ้ง (Add-ons)';
     }
 
     // Render Cup Option
@@ -478,7 +483,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const cupDiv = document.getElementById('modal-cup');
     if (currentProduct.CupOption) {
         const opts = currentProduct.CupOption.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             cupContainer.style.display = 'block';
             cupDiv.innerHTML = opts.map((opt) => {
                 const isChecked = currentProduct.selectedCup === opt;
@@ -501,7 +506,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const sweetnessDiv = document.getElementById('modal-sweetness');
     if (currentProduct.Sweetness) {
         const opts = currentProduct.Sweetness.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             sweetnessContainer.style.display = 'block';
             sweetnessDiv.innerHTML = opts.map((opt) => {
                 const isChecked = currentProduct.selectedSweetness === opt;
@@ -524,7 +529,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const typeDiv = document.getElementById('modal-type');
     if (currentProduct.Type) {
         const opts = currentProduct.Type.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             typeContainer.style.display = 'block';
             typeDiv.innerHTML = opts.map((opt) => {
                 const parts = opt.split('+');
@@ -551,7 +556,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const milkDiv = document.getElementById('modal-milk');
     if (currentProduct.Milk) {
         const opts = currentProduct.Milk.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             milkContainer.style.display = 'block';
             milkDiv.innerHTML = opts.map((opt) => {
                 const parts = opt.split('+');
@@ -578,7 +583,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const addonsDiv = document.getElementById('modal-addons');
     if (currentProduct.Addons) {
         const opts = currentProduct.Addons.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             addonsContainer.style.display = 'block';
             addonsDiv.innerHTML = opts.map((opt) => {
                 const parts = opt.split('+');
@@ -607,7 +612,7 @@ function populateModalWithCurrentProduct(isEdit) {
     const sauceDiv = document.getElementById('modal-sauce');
     if (currentProduct.Sauce) {
         const opts = currentProduct.Sauce.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-        if(opts.length > 0) {
+        if (opts.length > 0) {
             sauceContainer.style.display = 'block';
             sauceDiv.innerHTML = opts.map((opt) => {
                 const parts = opt.split('+');
@@ -633,7 +638,7 @@ function populateModalWithCurrentProduct(isEdit) {
     }
 
     document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
-    
+
     updateModalPrice();
     document.getElementById('product-modal').classList.add('active');
 }
@@ -662,7 +667,7 @@ function updateSauceSelection() {
 function updateModalPrice() {
     let basePrice = parseFloat(currentProduct.Price) || 0;
     let addonsPrice = 0;
-    
+
     // Check Sauce
     const sauceCheckboxes = document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked');
     sauceCheckboxes.forEach(cb => {
@@ -686,7 +691,7 @@ function updateModalPrice() {
     if (selectedTypeEl && document.getElementById('modal-type-container').style.display !== 'none') {
         addonsPrice += parseFloat(selectedTypeEl.dataset.price) || 0;
     }
-    
+
     let total = (basePrice + addonsPrice) * currentProduct.quantity;
     document.getElementById('modal-total-price').textContent = total;
 }
@@ -695,7 +700,7 @@ function updateModalPrice() {
 // ระบบตะกร้าสินค้า (Cart)
 // ==========================================
 function addOrMergeCartItem(product) {
-    const existingIndex = cart.findIndex(item => 
+    const existingIndex = cart.findIndex(item =>
         item.Name === product.Name &&
         item.selectedType === product.selectedType &&
         item.selectedSweetness === product.selectedSweetness &&
@@ -767,14 +772,14 @@ function addToCart() {
         sauce.push(cb.value);
         sauceTotalPrice += parseFloat(cb.dataset.price) || 0;
     });
-    
+
     if (document.getElementById('modal-sauce-container').style.display !== 'none') {
         if (sauce.length === 0) {
             alert('กรุณาเลือกซอสอย่างน้อย 1 อย่าง (เลือกได้สูงสุด 2 อย่าง)');
             return;
         }
     }
-    
+
     currentProduct.selectedSauce = sauce;
     currentProduct.addonsPrice = addonsTotalPrice + sauceTotalPrice + milkPrice + typePrice;
 
@@ -792,10 +797,10 @@ function addToCart() {
     } else {
         addOrMergeCartItem(currentProduct);
     }
-    
+
     closeModal();
     renderCart();
-    
+
     // Open cart automatically on mobile (ปิดไว้ตามคำขอ)
     // if(window.innerWidth < 768) {
     //     document.getElementById('cart-panel').classList.remove('collapsed');
@@ -834,7 +839,7 @@ function renderCart() {
     cartItems.innerHTML = cart.map((item, index) => {
         totalItems += item.quantity;
         totalPrice += item.itemTotal;
-        
+
         let optionsText = [];
         if (item.selectedType) optionsText.push(`รูปแบบ: ${item.selectedType}`);
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
@@ -842,7 +847,7 @@ function renderCart() {
         if (item.selectedCup) optionsText.push(`การรับ: ${item.selectedCup}`);
         if (item.selectedSauce && item.selectedSauce.length > 0) optionsText.push(`ซอส: ${item.selectedSauce.join(', ')}`);
         if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
-        
+
         return `
         <div class="cart-item">
             <div class="item-details">
@@ -877,7 +882,7 @@ function renderCart() {
 }
 
 function toggleCart() {
-    if(window.innerWidth < 768) {
+    if (window.innerWidth < 768) {
         document.getElementById('cart-panel').classList.toggle('collapsed');
     }
 }
@@ -889,7 +894,7 @@ function copyOrder() {
     if (cart.length === 0) return;
 
     const phoneInput = document.getElementById('customer-phone').value.trim();
-    
+
     // ตรวจสอบเบอร์โทรศัพท์สำหรับสะสมแต้ม
     if (!phoneInput) {
         document.getElementById('confirm-modal').classList.add('active');
@@ -905,7 +910,7 @@ function closeConfirmModal() {
 
 function proceedWithOrder() {
     closeConfirmModal(); // ปิด Modal (ถ้าเปิดอยู่)
-    
+
     // บันทึกประวัติการสั่งซื้อ (เก็บสูงสุด 10 รายการล่าสุด)
     if (cart.length > 0) {
         let history = JSON.parse(localStorage.getItem('chawave_history')) || [];
@@ -915,11 +920,11 @@ function proceedWithOrder() {
         history = history.slice(0, 10);
         localStorage.setItem('chawave_history', JSON.stringify(history));
     }
-    
+
     const phoneInput = document.getElementById('customer-phone').value.trim();
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
     const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
-    
+
     let orderText = "📝 รายการสั่งซื้อ\n";
     if (phoneInput) {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
@@ -929,22 +934,22 @@ function proceedWithOrder() {
         orderText += `📌 แผนที่จัดส่ง: ${userLocationUrl}\n`;
     }
     orderText += "------------------------\n";
-    
+
     cart.forEach(item => {
         let line = `${item.quantity}x ${item.Name}`;
-        
+
         let details = [];
-        if(item.selectedType) details.push(item.selectedType);
-        if(item.selectedSweetness) details.push(item.selectedSweetness);
-        if(item.selectedMilk) details.push(item.selectedMilk);
-        if(item.selectedCup) details.push(item.selectedCup);
-        if(item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
-        if(item.note) details.push(`หมายเหตุ: ${item.note}`);
-        
-        if(details.length > 0) {
+        if (item.selectedType) details.push(item.selectedType);
+        if (item.selectedSweetness) details.push(item.selectedSweetness);
+        if (item.selectedMilk) details.push(item.selectedMilk);
+        if (item.selectedCup) details.push(item.selectedCup);
+        if (item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
+        if (item.note) details.push(`หมายเหตุ: ${item.note}`);
+
+        if (details.length > 0) {
             line += ` (${details.join(' | ')})`;
         }
-        
+
         line += `\n`;
         orderText += line;
     });
@@ -954,17 +959,47 @@ function proceedWithOrder() {
     // Copy to clipboard as a backup
     navigator.clipboard.writeText(orderText).catch(e => console.log('Clipboard fallback failed', e));
 
+    // ส่งข้อมูลเข้า Google Sheets
+    if (typeof GOOGLE_SHEETS_SCRIPT_URL !== 'undefined' && GOOGLE_SHEETS_SCRIPT_URL && GOOGLE_SHEETS_SCRIPT_URL.startsWith("https://script.google.com")) {
+        const orderPayload = {
+            action: 'create_web_order',
+            phone: phoneInput,
+            delivery: deliveryMethod,
+            locationUrl: userLocationUrl,
+            items: cart.map(item => ({
+                name: item.Name,
+                quantity: item.quantity,
+                type: item.selectedType || "",
+                sweetness: item.selectedSweetness || "",
+                milk: item.selectedMilk || "",
+                cup: item.selectedCup || "",
+                addons: item.selectedAddons || [],
+                sauce: item.selectedSauce || [],
+                note: item.note || ""
+            }))
+        };
+
+        fetch(GOOGLE_SHEETS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify(orderPayload)
+        }).catch(err => console.error("Error sending order to Sheets:", err));
+    }
+
     // ส่งข้อความไปที่ LINE
     // ใช้ oaMessage เพื่อเข้าแชทร้านโดยตรง
-    const LINE_OA_ID = "@720cvcjz"; 
+    const LINE_OA_ID = "@720cvcjz";
     const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(orderText)}`;
-    
+
     showToast("คัดลอกแล้ว! กรุณากด 'วาง' ในแชทเพื่อส่ง");
-    
+
     // เคลียร์ตะกร้าเมื่อส่งสำเร็จ
     cart = [];
     renderCart();
-    
+
     // เปิด LINE ทันที (ไม่ใช้ setTimeout เพื่อป้องกันเบราว์เซอร์บล็อกการเปลี่ยนหน้าเว็บ)
     window.location.href = lineUrl;
 }
@@ -995,7 +1030,7 @@ function toggleLocation(show) {
 function getLocation() {
     const status = document.getElementById('location-status');
     const btn = document.getElementById('get-location-btn');
-    
+
     if (!navigator.geolocation) {
         status.textContent = "เบราว์เซอร์ของคุณไม่รองรับการดึงตำแหน่ง";
         status.style.color = "red";
@@ -1012,9 +1047,9 @@ function getLocation() {
         (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            
+
             const distance = calculateDistance(STORE_LAT, STORE_LNG, lat, lng);
-            
+
             if (distance > MAX_DELIVERY_DISTANCE_KM) {
                 status.innerHTML = `<i class="fas fa-times-circle"></i> อยู่นอกระยะให้บริการ (${distance.toFixed(1)} กม.) รองรับไม่เกิน ${MAX_DELIVERY_DISTANCE_KM} กม.`;
                 status.style.color = "red";
@@ -1031,7 +1066,7 @@ function getLocation() {
         },
         (error) => {
             let msg = "ไม่สามารถดึงตำแหน่งได้";
-            if(error.code === 1) msg = "กรุณาอนุญาตการเข้าถึงตำแหน่งที่ตั้ง";
+            if (error.code === 1) msg = "กรุณาอนุญาตการเข้าถึงตำแหน่งที่ตั้ง";
             status.textContent = msg;
             status.style.color = "red";
             btn.style.display = 'block'; // แสดงปุ่มให้ลองใหม่
@@ -1045,12 +1080,12 @@ function getLocation() {
 window.onload = () => {
     initApp();
     renderCart(); // โหลดตะกร้าที่บันทึกไว้
-    
+
     // ตั้งค่าระบบค้นหา
     const searchInput = document.getElementById('search-input');
     const searchWrapper = document.getElementById('search-wrapper');
     const searchToggleBtn = document.getElementById('search-toggle-btn');
-    
+
     if (searchToggleBtn && searchWrapper && searchInput) {
         searchToggleBtn.addEventListener('click', () => {
             searchWrapper.classList.toggle('active');
@@ -1064,14 +1099,14 @@ window.onload = () => {
                 }
             }
         });
-        
-        searchInput.addEventListener('input', function(e) {
+
+        searchInput.addEventListener('input', function (e) {
             const val = e.target.value.trim();
             if (val.length >= 3 || val.length === 0) {
                 renderMenu();
             }
         });
-        
+
         // ย่อช่องค้นหากลับเมื่อคลิกที่อื่น (ถ้าไม่ได้พิมพ์อะไรไว้)
         document.addEventListener('click', (e) => {
             if (!searchWrapper.contains(e.target) && searchWrapper.classList.contains('active')) {
@@ -1091,7 +1126,7 @@ window.onload = () => {
         }
 
         // บันทึกเบอร์โทรศัพท์เมื่อมีการพิมพ์
-        phoneInputEl.addEventListener('input', function(e) {
+        phoneInputEl.addEventListener('input', function (e) {
             localStorage.setItem('chawave_phone', e.target.value.trim());
         });
     }
