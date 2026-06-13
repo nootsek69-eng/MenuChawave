@@ -982,6 +982,7 @@ function proceedWithOrder() {
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
+            keepalive: true, // ป้องกันการยกเลิก request เมื่อเบราว์เซอร์เปิดไปที่หน้า LINE ทันที
             headers: {
                 'Content-Type': 'text/plain'
             },
