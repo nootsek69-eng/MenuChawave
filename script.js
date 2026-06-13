@@ -882,8 +882,10 @@ function renderCart() {
 }
 
 function toggleCart() {
-    if (window.innerWidth < 768) {
-        document.getElementById('cart-panel').classList.toggle('collapsed');
+    const cartPanel = document.getElementById('cart-panel');
+    if (cartPanel) {
+        cartPanel.classList.toggle('collapsed');
+        document.body.classList.toggle('cart-collapsed', cartPanel.classList.contains('collapsed'));
     }
 }
 
@@ -925,6 +927,32 @@ function proceedWithOrder() {
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
     const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
 
+    // ฟังก์ชันช่วยหาค่าราคาของตัวเลือกเพื่อแสดงผล
+    const getOptionPrice = (defString, selectedName) => {
+        if (!selectedName || !defString) return 0;
+        const opts = defString.split(/[,|]/);
+        for (let opt of opts) {
+            const parts = opt.split('+');
+            const name = parts[0].trim();
+            if (name === selectedName) {
+                return parts.length > 1 ? (parseFloat(parts[1].trim()) || 0) : 0;
+            }
+        }
+        return 0;
+    };
+
+    const getOptionDisplay = (defString, selectedName) => {
+        if (!selectedName) return "";
+        const price = getOptionPrice(defString, selectedName);
+        return price > 0 ? `${selectedName} (+${price}฿)` : selectedName;
+    };
+
+    const getOptionWithPricePayload = (defString, selectedName) => {
+        if (!selectedName) return "";
+        const price = getOptionPrice(defString, selectedName);
+        return price > 0 ? `${selectedName} +${price}` : selectedName;
+    };
+
     let orderText = "📝 รายการสั่งซื้อ\n";
     if (phoneInput) {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
@@ -935,16 +963,36 @@ function proceedWithOrder() {
     }
     orderText += "------------------------\n";
 
+    let grandTotal = 0;
+
     cart.forEach(item => {
         let line = `${item.quantity}x ${item.Name}`;
+        grandTotal += item.itemTotal;
 
         let details = [];
-        if (item.selectedType) details.push(item.selectedType);
-        if (item.selectedSweetness) details.push(item.selectedSweetness);
-        if (item.selectedMilk) details.push(item.selectedMilk);
-        if (item.selectedCup) details.push(item.selectedCup);
-        if (item.selectedAddons.length > 0) details.push(item.selectedAddons.join(', '));
-        if (item.note) details.push(`หมายเหตุ: ${item.note}`);
+        if (item.selectedType) {
+            details.push(getOptionDisplay(item.Type, item.selectedType));
+        }
+        if (item.selectedSweetness) {
+            details.push(item.selectedSweetness);
+        }
+        if (item.selectedMilk) {
+            details.push(getOptionDisplay(item.Milk, item.selectedMilk));
+        }
+        if (item.selectedCup) {
+            details.push(item.selectedCup);
+        }
+        if (item.selectedSauce && item.selectedSauce.length > 0) {
+            const sauceDisplay = item.selectedSauce.map(name => getOptionDisplay(item.Sauce, name));
+            details.push(`ซอส: ${sauceDisplay.join(', ')}`);
+        }
+        if (item.selectedAddons && item.selectedAddons.length > 0) {
+            const addonsDisplay = item.selectedAddons.map(name => getOptionDisplay(item.Addons, name));
+            details.push(`เพิ่ม: ${addonsDisplay.join(', ')}`);
+        }
+        if (item.note) {
+            details.push(`หมายเหตุ: ${item.note}`);
+        }
 
         if (details.length > 0) {
             line += ` (${details.join(' | ')})`;
@@ -955,6 +1003,7 @@ function proceedWithOrder() {
     });
 
     orderText += "------------------------\n";
+    orderText += `💰 ราคารวมทั้งหมด: ${grandTotal} ฿\n`;
 
     // Copy to clipboard as a backup
     navigator.clipboard.writeText(orderText).catch(e => console.log('Clipboard fallback failed', e));
@@ -966,17 +1015,24 @@ function proceedWithOrder() {
             phone: phoneInput,
             delivery: deliveryMethod,
             locationUrl: userLocationUrl,
-            items: cart.map(item => ({
-                name: item.Name,
-                quantity: item.quantity,
-                type: item.selectedType || "",
-                sweetness: item.selectedSweetness || "",
-                milk: item.selectedMilk || "",
-                cup: item.selectedCup || "",
-                addons: item.selectedAddons || [],
-                sauce: item.selectedSauce || [],
-                note: item.note || ""
-            }))
+            items: cart.map(item => {
+                const typeWithPrice = getOptionWithPricePayload(item.Type, item.selectedType);
+                const milkWithPrice = getOptionWithPricePayload(item.Milk, item.selectedMilk);
+                const addonsWithPrices = (item.selectedAddons || []).map(name => getOptionWithPricePayload(item.Addons, name));
+                const sauceWithPrices = (item.selectedSauce || []).map(name => getOptionWithPricePayload(item.Sauce, name));
+
+                return {
+                    name: item.Name,
+                    quantity: item.quantity,
+                    type: typeWithPrice,
+                    sweetness: item.selectedSweetness || "",
+                    milk: milkWithPrice,
+                    cup: item.selectedCup || "",
+                    addons: addonsWithPrices,
+                    sauce: sauceWithPrices,
+                    note: item.note || ""
+                };
+            })
         };
 
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
@@ -1081,6 +1137,12 @@ function getLocation() {
 window.onload = () => {
     initApp();
     renderCart(); // โหลดตะกร้าที่บันทึกไว้
+
+    // ซิงค์สถานะตัวย่อตะกร้ากับ body สำหรับการจัด layout บนคอม
+    const cartPanel = document.getElementById('cart-panel');
+    if (cartPanel && cartPanel.classList.contains('collapsed')) {
+        document.body.classList.add('cart-collapsed');
+    }
 
     // ตั้งค่าระบบค้นหา
     const searchInput = document.getElementById('search-input');
