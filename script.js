@@ -10,7 +10,7 @@ const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1v
 // ==========================================
 // ลิงก์ Google Apps Script สำหรับรับออเดอร์เข้า POS
 // ==========================================
-const GOOGLE_SHEETS_SCRIPT_URL = "https://script.google.com/macros/library/d/1XivuFi25oF6rqLO5ce-KO_TKziXPPrx0C-SDgd9DVb5y2LROibOYCDfb/5"; // วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
+const GOOGLE_SHEETS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymA0U8_1GWRx7zvZXpNzCiSrdq_HLpU-Dcax1aS9Anb7QDdEqnRXfrt5wZe6tCs8W3/exec"; // วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
 
 // ==========================================
 // การตั้งค่าตำแหน่งร้าน (พิกัด ละติจูด, ลองจิจูด)
