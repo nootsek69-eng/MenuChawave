@@ -1038,9 +1038,13 @@ function proceedWithOrder() {
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
+            cache: 'no-cache',
             keepalive: true, // ป้องกันการยกเลิก request เมื่อเบราว์เซอร์เปิดไปที่หน้า LINE ทันที
             headers: {
-                'Content-Type': 'text/plain'
+                'Content-Type': 'text/plain',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
             body: JSON.stringify(orderPayload)
         }).catch(err => console.error("Error sending order to Sheets:", err));
