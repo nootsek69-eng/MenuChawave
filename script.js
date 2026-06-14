@@ -1041,10 +1041,7 @@ function proceedWithOrder() {
             cache: 'no-cache',
             keepalive: true, // ป้องกันการยกเลิก request เมื่อเบราว์เซอร์เปิดไปที่หน้า LINE ทันที
             headers: {
-                'Content-Type': 'text/plain',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
+                'Content-Type': 'text/plain'
             },
             body: JSON.stringify(orderPayload)
         }).catch(err => console.error("Error sending order to Sheets:", err));
