@@ -927,6 +927,9 @@ function proceedWithOrder() {
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
     const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'รับที่เคาน์เตอร์ (Counter Pickup)';
 
+    const paymentMethodEl = document.querySelector('input[name="payment_method"]:checked');
+    const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'เงินสด';
+
     // ฟังก์ชันช่วยหาค่าราคาของตัวเลือกเพื่อแสดงผล
     const getOptionPrice = (defString, selectedName) => {
         if (!selectedName || !defString) return 0;
@@ -961,6 +964,7 @@ function proceedWithOrder() {
     if (deliveryMethod === 'จัดส่ง (Delivery)' && userLocationUrl) {
         orderText += `📌 แผนที่จัดส่ง: ${userLocationUrl}\n`;
     }
+    orderText += `💳 ช่องทางการชำระ: ${paymentMethod}\n`;
     orderText += "------------------------\n";
 
     let grandTotal = 0;
@@ -1014,6 +1018,7 @@ function proceedWithOrder() {
             action: 'create_web_order',
             phone: phoneInput,
             delivery: deliveryMethod,
+            payment: paymentMethod,
             locationUrl: userLocationUrl,
             items: cart.map(item => {
                 const typeWithPrice = getOptionWithPricePayload(item.Type, item.selectedType);
@@ -1194,6 +1199,38 @@ window.onload = () => {
             localStorage.setItem('chawave_phone', e.target.value.trim());
         });
     }
+
+    // โหลดช่องทางการรับสินค้าและชำระเงินจาก LocalStorage
+    const savedDelivery = localStorage.getItem('chawave_delivery_method');
+    if (savedDelivery) {
+        const deliveryRadio = document.querySelector(`input[name="delivery_method"][value="${savedDelivery}"]`);
+        if (deliveryRadio) {
+            deliveryRadio.checked = true;
+            if (typeof toggleLocation === 'function') {
+                toggleLocation(savedDelivery === 'จัดส่ง (Delivery)');
+            }
+        }
+    }
+    
+    document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
+        radio.addEventListener('change', function(e) {
+            localStorage.setItem('chawave_delivery_method', e.target.value);
+        });
+    });
+
+    const savedPayment = localStorage.getItem('chawave_payment_method');
+    if (savedPayment) {
+        const paymentRadio = document.querySelector(`input[name="payment_method"][value="${savedPayment}"]`);
+        if (paymentRadio) {
+            paymentRadio.checked = true;
+        }
+    }
+
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function(e) {
+            localStorage.setItem('chawave_payment_method', e.target.value);
+        });
+    });
 
     // แจ้งเตือนวันหยุด (วันอาทิตย์)
     const today = new Date();

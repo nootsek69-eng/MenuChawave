@@ -95,6 +95,24 @@
                 </div>
             </div>
 
+            <div class="payment-method" style="margin-top: 1rem; margin-bottom: 1rem;">
+                <label>ช่องทางการชำระเงิน:</label>
+                <div class="delivery-options" style="grid-template-columns: repeat(3, 1fr);">
+                    <label class="delivery-radio">
+                        <input type="radio" name="payment_method" value="เงินสด" checked>
+                        <span style="line-height: 1.2; padding: 0.5rem;">เงินสด</span>
+                    </label>
+                    <label class="delivery-radio">
+                        <input type="radio" name="payment_method" value="QR Code">
+                        <span style="line-height: 1.2; padding: 0.5rem;">QR Code</span>
+                    </label>
+                    <label class="delivery-radio">
+                        <input type="radio" name="payment_method" value="โครงการรัฐ">
+                        <span style="line-height: 1.2; padding: 0.5rem;">โครงการรัฐ</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="location-section" id="location-section" style="display: none; margin-bottom: 1.5rem;">
                 <label style="display: block; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 500;">ตำแหน่งจัดส่ง:</label>
                 <button type="button" class="location-btn" id="get-location-btn" onclick="getLocation()" style="display: none;">
