@@ -925,7 +925,7 @@ function proceedWithOrder() {
 
     const phoneInput = document.getElementById('customer-phone').value.trim();
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
-    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '🚶 เข้าไปรับที่ร้าน';
+    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'รับที่เคาน์เตอร์ (Counter Pickup)';
 
     // ฟังก์ชันช่วยหาค่าราคาของตัวเลือกเพื่อแสดงผล
     const getOptionPrice = (defString, selectedName) => {
@@ -958,7 +958,7 @@ function proceedWithOrder() {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
     }
     orderText += `📍 การรับสินค้า: ${deliveryMethod}\n`;
-    if (deliveryMethod === '🛵 ส่งปลายทาง' && userLocationUrl) {
+    if (deliveryMethod === 'จัดส่ง (Delivery)' && userLocationUrl) {
         orderText += `📌 แผนที่จัดส่ง: ${userLocationUrl}\n`;
     }
     orderText += "------------------------\n";
@@ -1194,4 +1194,26 @@ window.onload = () => {
             localStorage.setItem('chawave_phone', e.target.value.trim());
         });
     }
+
+    // แจ้งเตือนวันหยุด (วันอาทิตย์)
+    const today = new Date();
+    if (today.getDay() === 0) { // 0 = วันอาทิตย์
+        const hasSeenSundayAlert = localStorage.getItem('sunday_alert_seen');
+        if (!hasSeenSundayAlert) {
+            setTimeout(() => {
+                const sundayModal = document.getElementById('sunday-modal');
+                if (sundayModal) {
+                    sundayModal.classList.add('active');
+                    localStorage.setItem('sunday_alert_seen', 'true');
+                }
+            }, 500); // ดีเลย์เล็กน้อยเพื่อให้เว็บโหลดเสร็จก่อน
+        }
+    }
 };
+
+function closeSundayModal() {
+    const modal = document.getElementById('sunday-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}

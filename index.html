@@ -81,12 +81,16 @@
                 <label>การรับสินค้า:</label>
                 <div class="delivery-options">
                     <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="🚶 เข้าไปรับที่ร้าน" onchange="toggleLocation(false)" checked>
-                        <span>เข้าไปรับที่ร้าน</span>
+                        <input type="radio" name="delivery_method" value="รับที่เคาน์เตอร์ (Counter Pickup)" onchange="toggleLocation(false)" checked>
+                        <span style="line-height: 1.2; padding: 0.5rem;">รับที่เคาน์เตอร์<br><small>(Counter Pickup)</small></span>
                     </label>
                     <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="🛵 ส่งปลายทาง" onchange="toggleLocation(true)">
-                        <span>ส่งปลายทาง</span>
+                        <input type="radio" name="delivery_method" value="รับที่รถ (Curbside Pickup)" onchange="toggleLocation(false)">
+                        <span style="line-height: 1.2; padding: 0.5rem;">รับที่รถ<br><small>(Curbside Pickup)</small></span>
+                    </label>
+                    <label class="delivery-radio">
+                        <input type="radio" name="delivery_method" value="จัดส่ง (Delivery)" onchange="toggleLocation(true)">
+                        <span style="line-height: 1.2; padding: 0.5rem;">จัดส่ง<br><small>(Delivery)</small></span>
                     </label>
                 </div>
             </div>
@@ -191,6 +195,21 @@
             <div style="display: flex; gap: 0.75rem;">
                 <button class="action-btn" onclick="closeConfirmModal()" style="background: var(--bg-color); color: var(--text-main); font-size: 1rem; padding: 0.75rem;">กลับไปกรอก</button>
                 <button class="action-btn" onclick="proceedWithOrder()" style="background: var(--primary); color: white; font-size: 1rem; padding: 0.75rem;">ยืนยันออเดอร์</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sunday Closed Modal -->
+    <div class="modal-overlay" id="sunday-modal">
+        <div class="modal-content" style="max-width: 320px; text-align: center; padding: 2rem 1.5rem;">
+            <i class="fas fa-store-slash" style="font-size: 3rem; color: #EF4444; margin-bottom: 1rem;"></i>
+            <h3 style="margin-bottom: 0.5rem;">แจ้งวันหยุดร้าน</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                ร้านหยุดให้บริการทุกวันอาทิตย์<br>
+                ขออภัยในความไม่สะดวกครับ
+            </p>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="action-btn" onclick="closeSundayModal()" style="background: var(--primary); color: white; font-size: 1rem; padding: 0.75rem; width: 100%;">รับทราบ</button>
             </div>
         </div>
     </div>
