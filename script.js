@@ -1017,7 +1017,7 @@ function proceedWithOrder() {
         const orderPayload = {
             action: 'create_web_order',
             phone: phoneInput,
-            delivery: deliveryMethod,
+            delivery: `${deliveryMethod} (ชำระเงิน: ${paymentMethod})`,
             payment: paymentMethod,
             locationUrl: userLocationUrl,
             items: cart.map(item => {
@@ -1039,10 +1039,6 @@ function proceedWithOrder() {
                 };
             })
         };
-
-        orderPayload.items.push({
-            "ช่องทางการชำระเงิน": paymentMethod
-        });
 
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
             method: 'POST',
