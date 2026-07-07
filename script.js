@@ -925,7 +925,7 @@ function proceedWithOrder() {
 
     const phoneInput = document.getElementById('customer-phone').value.trim();
     const deliveryMethodEl = document.querySelector('input[name="delivery_method"]:checked');
-    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'รับที่เคาน์เตอร์ (Counter Pickup)';
+    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'รับที่เคาน์เตอร์';
 
     const paymentMethodEl = document.querySelector('input[name="payment_method"]:checked');
     const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'เงินสด';
@@ -961,7 +961,7 @@ function proceedWithOrder() {
         orderText += `📞 เบอร์ติดต่อ: ${phoneInput}\n`;
     }
     orderText += `📍 การรับสินค้า: ${deliveryMethod}\n`;
-    if (deliveryMethod === 'จัดส่ง (Delivery)' && userLocationUrl) {
+    if (deliveryMethod === 'จัดส่ง' && userLocationUrl) {
         orderText += `📌 แผนที่จัดส่ง: ${userLocationUrl}\n`;
     }
     orderText += `💳 ช่องทางการชำระ: ${paymentMethod}\n`;
@@ -1207,7 +1207,7 @@ window.onload = () => {
         if (deliveryRadio) {
             deliveryRadio.checked = true;
             if (typeof toggleLocation === 'function') {
-                toggleLocation(savedDelivery === 'จัดส่ง (Delivery)');
+                toggleLocation(savedDelivery === 'จัดส่ง');
             }
         }
     }
