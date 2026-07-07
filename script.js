@@ -1017,7 +1017,7 @@ function proceedWithOrder() {
         const orderPayload = {
             action: 'create_web_order',
             phone: phoneInput,
-            delivery: `${deliveryMethod} (ชำระเงิน: ${paymentMethod})`,
+            delivery: `${deliveryMethod} || ${paymentMethod}`,
             payment: paymentMethod,
             locationUrl: userLocationUrl,
             items: cart.map(item => {
