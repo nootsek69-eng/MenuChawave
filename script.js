@@ -1041,15 +1041,7 @@ function proceedWithOrder() {
         };
 
         orderPayload.items.push({
-            name: "ช่องทางการชำระเงิน: " + paymentMethod,
-            quantity: 1,
-            type: "",
-            sweetness: "",
-            milk: "",
-            cup: "",
-            addons: [],
-            sauce: [],
-            note: ""
+            "ช่องทางการชำระเงิน": paymentMethod
         });
 
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
