@@ -1017,8 +1017,7 @@ function proceedWithOrder() {
         const orderPayload = {
             action: 'create_web_order',
             phone: phoneInput,
-            delivery: deliveryMethod + ' (ชำระ: ' + paymentMethod + ')',
-            note: 'ชำระ: ' + paymentMethod,
+            delivery: deliveryMethod,
             payment: paymentMethod,
             locationUrl: userLocationUrl,
             items: cart.map(item => {
@@ -1040,6 +1039,18 @@ function proceedWithOrder() {
                 };
             })
         };
+
+        orderPayload.items.push({
+            name: "ช่องทางการชำระเงิน: " + paymentMethod,
+            quantity: 1,
+            type: "",
+            sweetness: "",
+            milk: "",
+            cup: "",
+            addons: [],
+            sauce: [],
+            note: ""
+        });
 
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
             method: 'POST',
