@@ -230,13 +230,18 @@ function toggleFavorite(name, event) {
 // ==========================================
 function openProductModal(index) {
     editingCartIndex = -1;
-    document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
+    document.getElementById('modal-add-btn').innerHTML = 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> บาท';
 
     const item = currentFilteredMenu[index];
     currentProduct = { ...item, quantity: 1, selectedAddons: [], selectedSauce: [], selectedSweetness: '', selectedMilk: '', selectedType: '', selectedCup: '', note: '' };
 
     document.getElementById('modal-title').textContent = item.Name;
-    document.getElementById('modal-base-price').textContent = `${item.Price} ฿`;
+    let priceHtml = `${item.Price} บาท`;
+    if (item.Price && String(item.Price).includes('/')) {
+        const parts = String(item.Price).split('/');
+        priceHtml = `<span style="font-size: 0.8em; text-decoration: line-through; opacity: 0.7; margin-right: 0.5vw;">${parts[1].trim()} บาท</span><span style="color: var(--primary); font-weight: bold;">${parts[0].trim()} บาท</span>`;
+    }
+    document.getElementById('modal-base-price').innerHTML = priceHtml;
     document.getElementById('modal-img').src = item.Image || 'logo.jpg';
     document.getElementById('modal-img').onerror = function () { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = '1';
@@ -466,7 +471,12 @@ function orderHistoryItem(index) {
 
 function populateModalWithCurrentProduct(isEdit) {
     document.getElementById('modal-title').textContent = currentProduct.Name;
-    document.getElementById('modal-base-price').textContent = `${currentProduct.Price} ฿`;
+    let priceHtml = `${currentProduct.Price} บาท`;
+    if (currentProduct.Price && String(currentProduct.Price).includes('/')) {
+        const parts = String(currentProduct.Price).split('/');
+        priceHtml = `<span style="font-size: 0.8em; text-decoration: line-through; opacity: 0.7; margin-right: 0.5vw;">${parts[1].trim()} บาท</span><span style="color: var(--primary); font-weight: bold;">${parts[0].trim()} บาท</span>`;
+    }
+    document.getElementById('modal-base-price').innerHTML = priceHtml;
     document.getElementById('modal-img').src = currentProduct.Image || 'logo.jpg';
     document.getElementById('modal-img').onerror = function () { this.src = 'logo.jpg'; };
     document.getElementById('modal-quantity').textContent = currentProduct.quantity;
@@ -644,7 +654,7 @@ function populateModalWithCurrentProduct(isEdit) {
         sauceContainer.style.display = 'none';
     }
 
-    document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> ฿' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> ฿';
+    document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> บาท' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> บาท';
 
     updateModalPrice();
     document.getElementById('product-modal').classList.add('active');
