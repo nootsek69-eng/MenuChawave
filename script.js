@@ -80,7 +80,7 @@ async function initApp() {
             header: true,
             skipEmptyLines: true,
             complete: function (results) {
-                menuData = results.data;
+                menuData = results.data.filter(item => item.Name && item.Name.trim() !== '');
                 renderCategories();
                 renderMenu();
             }
