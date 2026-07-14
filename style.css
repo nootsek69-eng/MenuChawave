@@ -306,6 +306,10 @@ body {
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+.promo-ribbon.recommended {
+    background-color: var(--primary);
+}
 .fav-icon:hover {
     transform: scale(1.1);
 }

@@ -163,13 +163,13 @@ function renderMenu() {
             return `
             <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
                 <div class="product-img-wrapper skeleton-loading">
-                    ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
+                    ${(item.Promotion && item.Promotion.trim() !== '') ? `<div class="promo-ribbon">${item.Promotion}</div>` : (item.Recommended && item.Recommended.trim().toLowerCase() !== 'no' && item.Recommended.trim() !== '') ? `<div class="promo-ribbon recommended">เมนูแนะนำ</div>` : ''}
                     <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')" onerror="this.src='${defaultImg}'; this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')">
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">${item.Name}</h3>
                     <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">${optionsText.join(' | ')}</div>
-                    <div class="product-price">${item.itemTotal / item.quantity} ฿</div>
+                    <div class="product-price">${item.itemTotal / item.quantity} บาท</div>
                     <button class="add-btn" style="width: 100%; margin-top: 5px;" onclick="orderHistoryItem(${index}); event.stopPropagation();"><i class="fas fa-redo"></i> สั่งอีกครั้ง</button>
                 </div>
             </div>
@@ -188,10 +188,17 @@ function renderMenu() {
     container.innerHTML = currentFilteredMenu.map((item, index) => {
         const defaultImg = 'logo.jpg';
         const isFav = favorites.includes(item.Name);
+        
+        let priceHtml = `${item.Price} บาท`;
+        if (item.Price && String(item.Price).includes('/')) {
+            const parts = String(item.Price).split('/');
+            priceHtml = `<span style="font-size: 0.8em; text-decoration: line-through; opacity: 0.7; margin-right: 0.5vw;">${parts[1].trim()} บาท</span><span style="color: var(--primary); font-weight: bold;">${parts[0].trim()} บาท</span>`;
+        }
+
         return `
         <div class="product-card" onclick="openProductModal(${index})">
             <div class="product-img-wrapper skeleton-loading">
-                ${item.Promotion ? `<div class="promo-ribbon">${item.Promotion}</div>` : ''}
+                ${(item.Promotion && item.Promotion.trim() !== '') ? `<div class="promo-ribbon">${item.Promotion}</div>` : (item.Recommended && item.Recommended.trim().toLowerCase() !== 'no' && item.Recommended.trim() !== '') ? `<div class="promo-ribbon recommended">เมนูแนะนำ</div>` : ''}
                 <img src="${item.Image || defaultImg}" alt="${item.Name}" class="product-img" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')" onerror="this.src='${defaultImg}'; this.classList.add('loaded'); this.parentElement.classList.remove('skeleton-loading')">
                 <div class="fav-icon ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.Name.replace(/'/g, "\\'")}', event)">
                     <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
@@ -199,7 +206,7 @@ function renderMenu() {
             </div>
             <div class="product-info">
                 <h3 class="product-name">${item.Name}</h3>
-                <div class="product-price">${item.Price} ฿</div>
+                <div class="product-price">${priceHtml}</div>
             </div>
         </div>
         `;
