@@ -56,14 +56,14 @@ async function initApp() {
         if (GOOGLE_SHEETS_CSV_URL) {
             try {
                 // Try fetching directly first
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL + "&t=" + new Date().getTime());
                 if (!response.ok) throw new Error("Network response was not ok");
                 csvString = await response.text();
             } catch (err) {
                 console.warn("Direct fetch failed (CORS issue), trying proxy...", err);
                 try {
                     // Fallback to corsproxy.io
-                    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(GOOGLE_SHEETS_CSV_URL);
+                    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(GOOGLE_SHEETS_CSV_URL + "&t=" + new Date().getTime());
                     const response = await fetch(proxyUrl);
                     if (!response.ok) throw new Error("Proxy failed");
                     csvString = await response.text();
