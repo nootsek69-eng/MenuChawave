@@ -81,6 +81,26 @@ async function initApp() {
             skipEmptyLines: true,
             complete: function (results) {
                 menuData = results.data.filter(item => item.Name && item.Name.trim() !== '');
+                // Sanitize existing cart items if any had unwanted sauce/addons from old bug
+                if (cart && cart.length > 0) {
+                    let changed = false;
+                    cart.forEach(c => {
+                        const base = menuData.find(m => m.Name === c.Name);
+                        if (base) {
+                            if (!base.Sauce && c.selectedSauce && c.selectedSauce.length > 0) {
+                                c.selectedSauce = [];
+                                changed = true;
+                            }
+                            if (!base.Addons && c.selectedAddons && c.selectedAddons.length > 0) {
+                                c.selectedAddons = [];
+                                changed = true;
+                            }
+                        }
+                    });
+                    if (changed) {
+                        renderCart();
+                    }
+                }
                 renderCategories();
                 renderMenu();
             }
@@ -158,7 +178,8 @@ function renderMenu() {
             if (item.selectedSweetness) optionsText.push(item.selectedSweetness);
             if (item.selectedMilk) optionsText.push(item.selectedMilk);
             if (item.selectedCup) optionsText.push(item.selectedCup);
-            if (item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(item.selectedAddons.join(', '));
+            if (item.Sauce && item.selectedSauce && item.selectedSauce.length > 0) optionsText.push(`ซอส: ${item.selectedSauce.join(', ')}`);
+            if (item.Addons && item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(item.selectedAddons.join(', '));
 
             return `
             <div class="product-card" onclick="orderHistoryItem(${index})" style="border-color: var(--primary);">
@@ -276,9 +297,13 @@ function openProductModal(index) {
             currentProduct.selectedCup = opts[0]; // default
         } else {
             cupContainer.style.display = 'none';
+            cupDiv.innerHTML = '';
+            currentProduct.selectedCup = '';
         }
     } else {
         cupContainer.style.display = 'none';
+        cupDiv.innerHTML = '';
+        currentProduct.selectedCup = '';
     }
 
     // Render Sweetness
@@ -298,9 +323,13 @@ function openProductModal(index) {
             currentProduct.selectedSweetness = opts[0]; // default
         } else {
             sweetnessContainer.style.display = 'none';
+            sweetnessDiv.innerHTML = '';
+            currentProduct.selectedSweetness = '';
         }
     } else {
         sweetnessContainer.style.display = 'none';
+        sweetnessDiv.innerHTML = '';
+        currentProduct.selectedSweetness = '';
     }
 
     // Render Type
@@ -329,9 +358,13 @@ function openProductModal(index) {
             currentProduct.selectedType = opts[0].split('+')[0].trim(); // default
         } else {
             typeContainer.style.display = 'none';
+            typeDiv.innerHTML = '';
+            currentProduct.selectedType = '';
         }
     } else {
         typeContainer.style.display = 'none';
+        typeDiv.innerHTML = '';
+        currentProduct.selectedType = '';
     }
 
     // Render Milk
@@ -360,9 +393,13 @@ function openProductModal(index) {
             currentProduct.selectedMilk = opts[0].split('+')[0].trim(); // default
         } else {
             milkContainer.style.display = 'none';
+            milkDiv.innerHTML = '';
+            currentProduct.selectedMilk = '';
         }
     } else {
         milkContainer.style.display = 'none';
+        milkDiv.innerHTML = '';
+        currentProduct.selectedMilk = '';
     }
 
     // Render Addons
@@ -394,9 +431,13 @@ function openProductModal(index) {
             }).join('');
         } else {
             addonsContainer.style.display = 'none';
+            addonsDiv.innerHTML = '';
+            currentProduct.selectedAddons = [];
         }
     } else {
         addonsContainer.style.display = 'none';
+        addonsDiv.innerHTML = '';
+        currentProduct.selectedAddons = [];
     }
 
     // Render Sauce
@@ -422,9 +463,13 @@ function openProductModal(index) {
             }).join('');
         } else {
             sauceContainer.style.display = 'none';
+            sauceDiv.innerHTML = '';
+            currentProduct.selectedSauce = [];
         }
     } else {
         sauceContainer.style.display = 'none';
+        sauceDiv.innerHTML = '';
+        currentProduct.selectedSauce = [];
     }
 
     updateModalPrice();
@@ -433,6 +478,10 @@ function openProductModal(index) {
 
 function closeModal() {
     document.getElementById('product-modal').classList.remove('active');
+    ['modal-cup', 'modal-sweetness', 'modal-type', 'modal-milk', 'modal-addons', 'modal-sauce'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+    });
 }
 
 function closeModalOnOutsideClick(event) {
@@ -460,7 +509,14 @@ function orderHistoryItem(index) {
         return;
     }
 
+    const baseItem = menuData[baseItemIndex];
     let productToAdd = JSON.parse(JSON.stringify(item));
+    if (!baseItem.Sauce) {
+        productToAdd.selectedSauce = [];
+    }
+    if (!baseItem.Addons) {
+        productToAdd.selectedAddons = [];
+    }
     productToAdd.quantity = 1; // Reset quantity to 1
     productToAdd.itemTotal = (parseFloat(productToAdd.Price) || 0) + (productToAdd.addonsPrice || 0);
 
@@ -513,9 +569,11 @@ function populateModalWithCurrentProduct(isEdit) {
             }).join('');
         } else {
             cupContainer.style.display = 'none';
+            cupDiv.innerHTML = '';
         }
     } else {
         cupContainer.style.display = 'none';
+        cupDiv.innerHTML = '';
     }
 
     // Render Sweetness
@@ -536,9 +594,11 @@ function populateModalWithCurrentProduct(isEdit) {
             }).join('');
         } else {
             sweetnessContainer.style.display = 'none';
+            sweetnessDiv.innerHTML = '';
         }
     } else {
         sweetnessContainer.style.display = 'none';
+        sweetnessDiv.innerHTML = '';
     }
 
     // Render Type
@@ -563,9 +623,11 @@ function populateModalWithCurrentProduct(isEdit) {
             }).join('');
         } else {
             typeContainer.style.display = 'none';
+            typeDiv.innerHTML = '';
         }
     } else {
         typeContainer.style.display = 'none';
+        typeDiv.innerHTML = '';
     }
 
     // Render Milk
@@ -590,9 +652,11 @@ function populateModalWithCurrentProduct(isEdit) {
             }).join('');
         } else {
             milkContainer.style.display = 'none';
+            milkDiv.innerHTML = '';
         }
     } else {
         milkContainer.style.display = 'none';
+        milkDiv.innerHTML = '';
     }
 
     // Render Addons
@@ -619,9 +683,13 @@ function populateModalWithCurrentProduct(isEdit) {
             }).join('');
         } else {
             addonsContainer.style.display = 'none';
+            addonsDiv.innerHTML = '';
+            currentProduct.selectedAddons = [];
         }
     } else {
         addonsContainer.style.display = 'none';
+        addonsDiv.innerHTML = '';
+        currentProduct.selectedAddons = [];
     }
 
     // Render Sauce
@@ -649,9 +717,13 @@ function populateModalWithCurrentProduct(isEdit) {
             setTimeout(updateSauceSelection, 0);
         } else {
             sauceContainer.style.display = 'none';
+            sauceDiv.innerHTML = '';
+            currentProduct.selectedSauce = [];
         }
     } else {
         sauceContainer.style.display = 'none';
+        sauceDiv.innerHTML = '';
+        currentProduct.selectedSauce = [];
     }
 
     document.getElementById('modal-add-btn').innerHTML = isEdit ? 'บันทึกการแก้ไข • <span id="modal-total-price">0</span> บาท' : 'เพิ่มลงตะกร้า • <span id="modal-total-price">0</span> บาท';
@@ -686,16 +758,20 @@ function updateModalPrice() {
     let addonsPrice = 0;
 
     // Check Sauce
-    const sauceCheckboxes = document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked');
-    sauceCheckboxes.forEach(cb => {
-        addonsPrice += parseFloat(cb.dataset.price) || 0;
-    });
+    if (document.getElementById('modal-sauce-container').style.display !== 'none') {
+        const sauceCheckboxes = document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked');
+        sauceCheckboxes.forEach(cb => {
+            addonsPrice += parseFloat(cb.dataset.price) || 0;
+        });
+    }
 
     // Check Addons
-    const checkboxes = document.querySelectorAll('#modal-addons input[type="checkbox"]:checked');
-    checkboxes.forEach(cb => {
-        addonsPrice += parseFloat(cb.dataset.price) || 0;
-    });
+    if (document.getElementById('modal-addons-container').style.display !== 'none') {
+        const checkboxes = document.querySelectorAll('#modal-addons input[type="checkbox"]:checked');
+        checkboxes.forEach(cb => {
+            addonsPrice += parseFloat(cb.dataset.price) || 0;
+        });
+    }
 
     // Check Milk Price
     const selectedMilkEl = document.querySelector('input[name="milk"]:checked');
@@ -717,6 +793,12 @@ function updateModalPrice() {
 // ระบบตะกร้าสินค้า (Cart)
 // ==========================================
 function addOrMergeCartItem(product) {
+    if (!product.Sauce) {
+        product.selectedSauce = [];
+    }
+    if (!product.Addons) {
+        product.selectedAddons = [];
+    }
     const existingIndex = cart.findIndex(item =>
         item.Name === product.Name &&
         item.selectedType === product.selectedType &&
@@ -776,21 +858,23 @@ function addToCart() {
     // Get Addons
     const addons = [];
     let addonsTotalPrice = 0;
-    document.querySelectorAll('#modal-addons input[type="checkbox"]:checked').forEach(cb => {
-        addons.push(cb.value);
-        addonsTotalPrice += parseFloat(cb.dataset.price) || 0;
-    });
+    if (document.getElementById('modal-addons-container').style.display !== 'none') {
+        document.querySelectorAll('#modal-addons input[type="checkbox"]:checked').forEach(cb => {
+            addons.push(cb.value);
+            addonsTotalPrice += parseFloat(cb.dataset.price) || 0;
+        });
+    }
     currentProduct.selectedAddons = addons;
 
     // Get Sauce
     const sauce = [];
     let sauceTotalPrice = 0;
-    document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked').forEach(cb => {
-        sauce.push(cb.value);
-        sauceTotalPrice += parseFloat(cb.dataset.price) || 0;
-    });
-
     if (document.getElementById('modal-sauce-container').style.display !== 'none') {
+        document.querySelectorAll('#modal-sauce input[type="checkbox"]:checked').forEach(cb => {
+            sauce.push(cb.value);
+            sauceTotalPrice += parseFloat(cb.dataset.price) || 0;
+        });
+
         if (sauce.length === 0) {
             alert('กรุณาเลือกซอสอย่างน้อย 1 อย่าง (เลือกได้สูงสุด 2 อย่าง)');
             return;
@@ -862,8 +946,8 @@ function renderCart() {
         if (item.selectedSweetness) optionsText.push(`ความหวาน: ${item.selectedSweetness}`);
         if (item.selectedMilk) optionsText.push(`นม: ${item.selectedMilk}`);
         if (item.selectedCup) optionsText.push(`การรับ: ${item.selectedCup}`);
-        if (item.selectedSauce && item.selectedSauce.length > 0) optionsText.push(`ซอส: ${item.selectedSauce.join(', ')}`);
-        if (item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
+        if (item.Sauce && item.selectedSauce && item.selectedSauce.length > 0) optionsText.push(`ซอส: ${item.selectedSauce.join(', ')}`);
+        if (item.Addons && item.selectedAddons && item.selectedAddons.length > 0) optionsText.push(`เพิ่ม: ${item.selectedAddons.join(', ')}`);
 
         return `
         <div class="cart-item">
@@ -1003,11 +1087,11 @@ function proceedWithOrder() {
         if (item.selectedCup) {
             details.push(item.selectedCup);
         }
-        if (item.selectedSauce && item.selectedSauce.length > 0) {
+        if (item.Sauce && item.selectedSauce && item.selectedSauce.length > 0) {
             const sauceDisplay = item.selectedSauce.map(name => getOptionDisplay(item.Sauce, name));
             details.push(`ซอส: ${sauceDisplay.join(', ')}`);
         }
-        if (item.selectedAddons && item.selectedAddons.length > 0) {
+        if (item.Addons && item.selectedAddons && item.selectedAddons.length > 0) {
             const addonsDisplay = item.selectedAddons.map(name => getOptionDisplay(item.Addons, name));
             details.push(`เพิ่ม: ${addonsDisplay.join(', ')}`);
         }
@@ -1040,8 +1124,8 @@ function proceedWithOrder() {
             items: cart.map(item => {
                 const typeWithPrice = getOptionWithPricePayload(item.Type, item.selectedType);
                 const milkWithPrice = getOptionWithPricePayload(item.Milk, item.selectedMilk);
-                const addonsWithPrices = (item.selectedAddons || []).map(name => getOptionWithPricePayload(item.Addons, name));
-                const sauceWithPrices = (item.selectedSauce || []).map(name => getOptionWithPricePayload(item.Sauce, name));
+                const addonsWithPrices = (item.Addons && item.selectedAddons ? item.selectedAddons : []).map(name => getOptionWithPricePayload(item.Addons, name));
+                const sauceWithPrices = (item.Sauce && item.selectedSauce ? item.selectedSauce : []).map(name => getOptionWithPricePayload(item.Sauce, name));
 
                 return {
                     name: item.Name,
