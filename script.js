@@ -1183,11 +1183,17 @@ function showToast(message) {
 let userLocationUrl = '';
 
 function toggleLocation(show) {
-    document.getElementById('location-section').style.display = show ? 'block' : 'none';
+    const status = document.getElementById('location-status');
+    const btn = document.getElementById('get-location-btn');
     if (show) {
         getLocation();
     } else {
         userLocationUrl = ''; // เคลียร์ถ้ากลับไปรับที่ร้าน
+        if (status) {
+            status.innerHTML = `<span style="color: var(--text-muted);">ไม่ต้องระบุ (รับที่ร้าน)</span>`;
+            status.style.color = "var(--text-muted)";
+        }
+        if (btn) btn.style.display = 'none';
     }
 }
 
@@ -1196,16 +1202,18 @@ function getLocation() {
     const btn = document.getElementById('get-location-btn');
 
     if (!navigator.geolocation) {
-        status.textContent = "เบราว์เซอร์ของคุณไม่รองรับการดึงตำแหน่ง";
+        status.textContent = "เบราว์เซอร์ไม่รองรับ";
         status.style.color = "red";
-        btn.style.display = 'block';
+        if (btn) btn.style.display = 'inline-flex';
         return;
     }
 
-    status.textContent = "กำลังค้นหาตำแหน่งของคุณ...";
+    status.textContent = "กำลังค้นหาตำแหน่ง...";
     status.style.color = "var(--text-muted)";
-    btn.style.display = 'none'; // ซ่อนปุ่มระหว่างค้นหา
-    btn.disabled = true;
+    if (btn) {
+        btn.style.display = 'none';
+        btn.disabled = true;
+    }
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -1215,26 +1223,32 @@ function getLocation() {
             const distance = calculateDistance(STORE_LAT, STORE_LNG, lat, lng);
 
             if (distance > MAX_DELIVERY_DISTANCE_KM) {
-                status.innerHTML = `<i class="fas fa-times-circle"></i> อยู่นอกระยะให้บริการ (${distance.toFixed(1)} กม.) รองรับไม่เกิน ${MAX_DELIVERY_DISTANCE_KM} กม.`;
+                status.innerHTML = `<i class="fas fa-times-circle"></i> นอกระยะ (${distance.toFixed(1)} กม.) สูงสุด ${MAX_DELIVERY_DISTANCE_KM} กม.`;
                 status.style.color = "red";
-                btn.style.display = 'block'; // แสดงปุ่มให้ลองใหม่
-                btn.disabled = false;
+                if (btn) {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                }
                 userLocationUrl = '';
             } else {
                 userLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
-                status.innerHTML = `<i class="fas fa-check-circle"></i> ดึงตำแหน่งสำเร็จ! ระยะทาง ${distance.toFixed(1)} กม.`;
+                status.innerHTML = `<i class="fas fa-check-circle"></i> สำเร็จ (${distance.toFixed(1)} กม.)`;
                 status.style.color = "#10B981";
-                btn.style.display = 'none'; // ซ่อนปุ่มถาวรถ้าสำเร็จ
-                btn.disabled = false;
+                if (btn) {
+                    btn.style.display = 'none';
+                    btn.disabled = false;
+                }
             }
         },
         (error) => {
             let msg = "ไม่สามารถดึงตำแหน่งได้";
-            if (error.code === 1) msg = "กรุณาอนุญาตการเข้าถึงตำแหน่งที่ตั้ง";
+            if (error.code === 1) msg = "ไม่อนุญาตสิทธิ์ตำแหน่ง";
             status.textContent = msg;
             status.style.color = "red";
-            btn.style.display = 'block'; // แสดงปุ่มให้ลองใหม่
-            btn.disabled = false;
+            if (btn) {
+                btn.style.display = 'inline-flex';
+                btn.disabled = false;
+            }
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -1310,7 +1324,11 @@ window.onload = () => {
             if (typeof toggleLocation === 'function') {
                 toggleLocation(savedDelivery === 'จัดส่ง');
             }
+        } else if (typeof toggleLocation === 'function') {
+            toggleLocation(false);
         }
+    } else if (typeof toggleLocation === 'function') {
+        toggleLocation(false);
     }
     
     document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {

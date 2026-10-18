@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
     <header class="app-header">
@@ -72,57 +72,67 @@
                 <span class="total-price"><span id="cart-total-price">0</span> ฿</span>
             </div>
             
-            <div class="customer-info">
-                <label for="customer-phone">เบอร์โทร (สำหรับสะสมแต้ม):</label>
-                <input type="tel" id="customer-phone" name="phone" autocomplete="tel" placeholder="08x-xxx-xxxx" class="phone-input">
-            </div>
-            
-            <div class="delivery-method">
-                <label>การรับสินค้า:</label>
-                <div class="delivery-options">
-                    <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="รับที่เคาน์เตอร์" onchange="toggleLocation(false)" checked>
-                        <span style="line-height: 1.2; padding: 0.5rem;">รับที่เคาน์เตอร์</span>
-                    </label>
-                    <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="รับที่รถ" onchange="toggleLocation(false)">
-                        <span style="line-height: 1.2; padding: 0.5rem;">รับที่รถ</span>
-                    </label>
-                    <label class="delivery-radio">
-                        <input type="radio" name="delivery_method" value="จัดส่ง" onchange="toggleLocation(true)">
-                        <span style="line-height: 1.2; padding: 0.5rem;">จัดส่ง</span>
-                    </label>
+            <div class="cart-compact-form">
+                <!-- Row 1: Phone -->
+                <div class="cart-compact-row">
+                    <label class="compact-label" for="customer-phone">เบอร์โทร:</label>
+                    <div class="compact-control">
+                        <input type="tel" id="customer-phone" name="phone" autocomplete="tel" placeholder="08x-xxx-xxxx (สะสมแต้ม)" class="compact-phone-input">
+                    </div>
                 </div>
-            </div>
-
-            <div class="payment-method" style="margin-top: 1rem; margin-bottom: 1rem;">
-                <label>ช่องทางการชำระเงิน:</label>
-                <div class="delivery-options" style="grid-template-columns: repeat(3, 1fr);">
-                    <label class="delivery-radio">
-                        <input type="radio" name="payment_method" value="เงินสด" checked>
-                        <span style="line-height: 1.2; padding: 0.5rem;">เงินสด</span>
-                    </label>
-                    <label class="delivery-radio">
-                        <input type="radio" name="payment_method" value="QR Code">
-                        <span style="line-height: 1.2; padding: 0.5rem;">QR Code</span>
-                    </label>
-                    <label class="delivery-radio">
-                        <input type="radio" name="payment_method" value="โครงการรัฐ">
-                        <span style="line-height: 1.2; padding: 0.5rem;">โครงการรัฐ</span>
-                    </label>
+                
+                <!-- Row 2: Delivery Method -->
+                <div class="cart-compact-row">
+                    <label class="compact-label">การรับ:</label>
+                    <div class="compact-control compact-radio-group">
+                        <label class="compact-radio">
+                            <input type="radio" name="delivery_method" value="รับที่เคาน์เตอร์" onchange="toggleLocation(false)" checked>
+                            <span>รับที่เคาน์เตอร์</span>
+                        </label>
+                        <label class="compact-radio">
+                            <input type="radio" name="delivery_method" value="รับที่รถ" onchange="toggleLocation(false)">
+                            <span>รับที่รถ</span>
+                        </label>
+                        <label class="compact-radio">
+                            <input type="radio" name="delivery_method" value="จัดส่ง" onchange="toggleLocation(true)">
+                            <span>จัดส่ง</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="location-section" id="location-section" style="display: none; margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 500;">ตำแหน่งจัดส่ง:</label>
-                <button type="button" class="location-btn" id="get-location-btn" onclick="getLocation()" style="display: none;">
-                    <i class="fas fa-sync-alt"></i> ดึงตำแหน่งอีกครั้ง
-                </button>
-                <div id="location-status" class="location-status" style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-muted);"></div>
+                <!-- Row 3: Payment Method -->
+                <div class="cart-compact-row">
+                    <label class="compact-label">ชำระเงิน:</label>
+                    <div class="compact-control compact-radio-group">
+                        <label class="compact-radio">
+                            <input type="radio" name="payment_method" value="เงินสด" checked>
+                            <span>เงินสด</span>
+                        </label>
+                        <label class="compact-radio">
+                            <input type="radio" name="payment_method" value="QR Code">
+                            <span>QR Code</span>
+                        </label>
+                        <label class="compact-radio">
+                            <input type="radio" name="payment_method" value="โครงการรัฐ">
+                            <span>โครงการรัฐ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Row 4: Location -->
+                <div class="cart-compact-row" id="location-section">
+                    <label class="compact-label">ตำแหน่ง:</label>
+                    <div class="compact-control compact-location-control">
+                        <div id="location-status" class="location-status-compact">ไม่ต้องระบุ (รับที่ร้าน)</div>
+                        <button type="button" class="compact-location-btn" id="get-location-btn" onclick="getLocation()" style="display: none;" title="ดึงตำแหน่งอีกครั้ง">
+                            <i class="fas fa-sync-alt"></i> ดึงใหม่
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <button class="checkout-btn" id="copy-btn" onclick="copyOrder()" disabled>
-                <i class="fab fa-line" style="font-size: 1.4rem;"></i> ยืนยันออเดอร์
+                <i class="fab fa-line" style="font-size: 1.3rem;"></i> ยืนยันออเดอร์
             </button>
         </div>
     </div>
@@ -237,6 +247,6 @@
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=31"></script>
+    <script src="script.js?v=32"></script>
 </body>
 </html>
