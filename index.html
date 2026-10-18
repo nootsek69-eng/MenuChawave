@@ -8,15 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
     <header class="app-header">
         <div class="header-content">
             <div class="header-inline">
                 <img src="logo.jpg" alt="Chawave Logo" class="store-logo-small" onerror="this.style.display='none'">
-                <p>เลือกเมนูและสั่งออเดอร์ได้เลยครับ</p>
+                <p>MENU CHAWAVE</p>
             </div>
+            <button type="button" class="store-info-button" onclick="openStoreInfoModal()" aria-label="ดูเวลาเปิด-ปิดร้าน" title="เวลาเปิด-ปิดร้าน">
+                <i class="fas fa-info" aria-hidden="true"></i>
+            </button>
         </div>
     </header>
 
@@ -251,11 +254,28 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="store-info-modal" onclick="closeStoreInfoModalOnOutsideClick(event)">
+        <section class="modal-content store-info-content" role="dialog" aria-modal="true" aria-labelledby="store-info-title">
+            <button type="button" class="close-modal" onclick="closeStoreInfoModal()" aria-label="ปิดข้อมูลเวลาเปิด-ปิด">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <div class="store-info-heading">
+                <i class="fas fa-clock store-info-icon" aria-hidden="true"></i>
+                <h2 id="store-info-title">เวลาเปิด-ปิดร้าน</h2>
+            </div>
+            <dl class="store-hours-list">
+                <div><dt>จันทร์–ศุกร์</dt><dd>07:00–16:00</dd></div>
+                <div><dt>วันเสาร์</dt><dd>09:00–16:00</dd></div>
+                <div class="store-hours-closed"><dt>วันอาทิตย์</dt><dd>หยุด</dd></div>
+            </dl>
+        </section>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="toast">คัดลอกข้อความแล้ว!</div>
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=35"></script>
+    <script src="script.js?v=36"></script>
 </body>
 </html>

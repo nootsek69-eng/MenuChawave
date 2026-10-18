@@ -49,10 +49,38 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.store-info-button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+}
+
+.store-info-button:hover,
+.store-info-button:focus-visible {
+    opacity: 0.75;
+}
+
 .header-inline {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    min-width: 0;
     gap: 1rem;
 }
 
@@ -65,6 +93,7 @@ body {
 }
 
 .header-content p {
+    min-width: 0;
     font-weight: 400;
     font-size: 1.25rem;
     margin: 0;
@@ -246,6 +275,7 @@ body {
     border-bottom: 1px solid var(--border-color);
     background: transparent;
     color: var(--text-main);
+    font-family: inherit;
     text-align: left;
     cursor: pointer;
 }
@@ -483,6 +513,7 @@ body {
 
 /* Centered Alert/Dialog Modals on all screen sizes */
 #sunday-modal,
+#store-info-modal,
 #confirm-modal {
     align-items: center !important;
     justify-content: center !important;
@@ -490,6 +521,7 @@ body {
 }
 
 #sunday-modal .modal-content,
+#store-info-modal .modal-content,
 #confirm-modal .modal-content {
     border-radius: var(--radius-lg) !important;
     margin: auto !important;
@@ -501,8 +533,61 @@ body {
 }
 
 #sunday-modal.active .modal-content,
+#store-info-modal.active .modal-content,
 #confirm-modal.active .modal-content {
     transform: scale(1) !important;
+}
+
+.store-info-content {
+    gap: 0.9rem;
+    padding: 2rem 1.5rem !important;
+}
+
+.store-info-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+}
+
+.store-info-icon {
+    color: var(--primary);
+    font-size: 1.35rem;
+}
+
+.store-info-content h2 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.2rem;
+}
+
+.store-hours-list {
+    display: grid;
+    width: 100%;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.store-hours-list > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+
+.store-hours-list > div:last-child {
+    border-bottom: 0;
+}
+
+.store-hours-list dd {
+    font-weight: 600;
+}
+
+.store-hours-closed dd {
+    color: #ef4444;
 }
 
 .close-modal {

@@ -1364,6 +1364,22 @@ function closeSundayModalOnOutsideClick(e) {
     }
 }
 
+function openStoreInfoModal() {
+    const modal = document.getElementById('store-info-modal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeStoreInfoModal() {
+    const modal = document.getElementById('store-info-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+function closeStoreInfoModalOnOutsideClick(event) {
+    if (event.target.id === 'store-info-modal') {
+        closeStoreInfoModal();
+    }
+}
+
 function startApp() {
     // แจ้งเตือนก่อนเริ่มงานตั้งค่าอื่น ๆ
     checkSundayAlert();
