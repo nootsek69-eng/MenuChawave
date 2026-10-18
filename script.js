@@ -1255,7 +1255,38 @@ function getLocation() {
 }
 
 // เริ่มต้นทำงาน
-window.onload = () => {
+function checkSundayAlert() {
+    // ล้างค่าเก่าที่อาจค้างอยู่ใน localStorage จากเวอร์ชันก่อน
+    try {
+        localStorage.removeItem('sunday_alert_seen');
+    } catch (e) {}
+
+    const today = new Date();
+    if (today.getDay() === 0) { // 0 = วันอาทิตย์
+        const sundayModal = document.getElementById('sunday-modal');
+        if (sundayModal) {
+            sundayModal.classList.add('active');
+        }
+    }
+}
+
+function closeSundayModal() {
+    const modal = document.getElementById('sunday-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function closeSundayModalOnOutsideClick(e) {
+    if (e.target.id === 'sunday-modal') {
+        closeSundayModal();
+    }
+}
+
+function startApp() {
+    // แจ้งเตือนก่อนเริ่มงานตั้งค่าอื่น ๆ
+    checkSundayAlert();
+
     initApp();
     renderCart(); // โหลดตะกร้าที่บันทึกไว้
 
@@ -1350,26 +1381,10 @@ window.onload = () => {
             localStorage.setItem('chawave_payment_method', e.target.value);
         });
     });
+}
 
-    // แจ้งเตือนวันหยุด (วันอาทิตย์)
-    const today = new Date();
-    if (today.getDay() === 0) { // 0 = วันอาทิตย์
-        const hasSeenSundayAlert = localStorage.getItem('sunday_alert_seen');
-        if (!hasSeenSundayAlert) {
-            setTimeout(() => {
-                const sundayModal = document.getElementById('sunday-modal');
-                if (sundayModal) {
-                    sundayModal.classList.add('active');
-                    localStorage.setItem('sunday_alert_seen', 'true');
-                }
-            }, 500); // ดีเลย์เล็กน้อยเพื่อให้เว็บโหลดเสร็จก่อน
-        }
-    }
-};
-
-function closeSundayModal() {
-    const modal = document.getElementById('sunday-modal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+} else {
+    startApp();
 }

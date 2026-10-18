@@ -395,6 +395,30 @@ body {
     }
 }
 
+/* Centered Alert/Dialog Modals on all screen sizes */
+#sunday-modal,
+#confirm-modal {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1.25rem !important;
+}
+
+#sunday-modal .modal-content,
+#confirm-modal .modal-content {
+    border-radius: var(--radius-lg) !important;
+    margin: auto !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    box-shadow: var(--shadow-lg) !important;
+    transform: scale(0.9) !important;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease !important;
+}
+
+#sunday-modal.active .modal-content,
+#confirm-modal.active .modal-content {
+    transform: scale(1) !important;
+}
+
 .close-modal {
     position: absolute;
     top: 15px;

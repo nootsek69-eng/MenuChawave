@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
     <header class="app-header">
@@ -228,7 +228,7 @@
     </div>
 
     <!-- Sunday Closed Modal -->
-    <div class="modal-overlay" id="sunday-modal">
+    <div class="modal-overlay" id="sunday-modal" onclick="closeSundayModalOnOutsideClick(event)">
         <div class="modal-content" style="max-width: 320px; text-align: center; padding: 2rem 1.5rem;">
             <i class="fas fa-store-slash" style="font-size: 3rem; color: #EF4444; margin-bottom: 1rem;"></i>
             <h3 style="margin-bottom: 0.5rem;">แจ้งวันหยุดร้าน</h3>
@@ -247,6 +247,6 @@
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=32"></script>
+    <script src="script.js?v=33"></script>
 </body>
 </html>
