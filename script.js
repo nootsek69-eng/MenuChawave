@@ -46,6 +46,7 @@ let currentCategory = 'All';
 let currentProduct = null;
 let editingCartIndex = -1;
 let menuViewMode = 'list';
+const preloadedMenuImageUrls = new Set();
 
 // ==========================================
 // การดึงข้อมูล (Fetch Data)
@@ -104,11 +105,43 @@ async function initApp() {
                 }
                 renderCategories();
                 renderMenu();
+                preloadMenuImages(menuData);
             }
         });
     } catch (error) {
         console.error("Error fetching data:", error);
         document.getElementById('menu-container').innerHTML = '<p class="loading">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+    }
+}
+
+function preloadMenuImages(items) {
+    const imageUrls = [...new Set(items
+        .map(item => item.Image && item.Image.trim())
+        .filter(Boolean))]
+        .filter(url => !preloadedMenuImageUrls.has(url));
+    let nextIndex = 0;
+    let activeLoads = 0;
+    const maxConcurrentLoads = 3;
+
+    function loadNextImage() {
+        while (activeLoads < maxConcurrentLoads && nextIndex < imageUrls.length) {
+            const imageUrl = imageUrls[nextIndex++];
+            preloadedMenuImageUrls.add(imageUrl);
+            activeLoads++;
+
+            const image = new Image();
+            image.decoding = 'async';
+            image.fetchPriority = 'low';
+            image.onload = image.onerror = () => {
+                activeLoads--;
+                loadNextImage();
+            };
+            image.src = imageUrl;
+        }
+    }
+
+    if (imageUrls.length > 0) {
+        window.setTimeout(loadNextImage, 150);
     }
 }
 
