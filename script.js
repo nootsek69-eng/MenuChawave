@@ -45,6 +45,7 @@ let favorites = JSON.parse(localStorage.getItem('chawave_favorites')) || [];
 let currentCategory = 'All';
 let currentProduct = null;
 let editingCartIndex = -1;
+let menuViewMode = 'list';
 
 // ==========================================
 // การดึงข้อมูล (Fetch Data)
@@ -132,6 +133,12 @@ function filterCategory(category) {
     renderMenu();
 }
 
+function setMenuView(mode) {
+    if (mode !== 'list' && mode !== 'cards') return;
+    menuViewMode = mode;
+    renderMenu();
+}
+
 function getFilteredMenu() {
     const searchInput = document.getElementById('search-input');
     const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
@@ -163,11 +170,33 @@ function getFilteredMenu() {
 
 function renderMenu() {
     const container = document.getElementById('menu-container');
+    const listViewButton = document.getElementById('list-view-button');
+    const cardViewButton = document.getElementById('card-view-button');
+
+    if (listViewButton && cardViewButton) {
+        listViewButton.classList.toggle('active', menuViewMode === 'list');
+        listViewButton.setAttribute('aria-pressed', String(menuViewMode === 'list'));
+        cardViewButton.classList.toggle('active', menuViewMode === 'cards');
+        cardViewButton.setAttribute('aria-pressed', String(menuViewMode === 'cards'));
+    }
+    container.classList.toggle('menu-list-view', menuViewMode === 'list');
 
     if (currentCategory === '🕒 ประวัติล่าสุด') {
         const history = JSON.parse(localStorage.getItem('chawave_history')) || [];
         if (history.length === 0) {
             container.innerHTML = '<p class="loading">ยังไม่มีประวัติการสั่งซื้อ</p>';
+            return;
+        }
+
+        if (menuViewMode === 'list') {
+            container.innerHTML = history.map((item, index) => `
+                <button type="button" class="menu-list-item" onclick="orderHistoryItem(${index})">
+                    <i class="fas fa-glass-water" aria-hidden="true"></i>
+                    <span class="menu-list-name">${item.Name}</span>
+                    ${(item.Recommended && item.Recommended.trim().toLowerCase() !== 'no' && item.Recommended.trim() !== '') ? '<span class="menu-recommended-badge">แนะนำ</span>' : ''}
+                    <span class="menu-list-price">${item.itemTotal / item.quantity} บาท</span>
+                </button>
+            `).join('');
             return;
         }
 
@@ -203,6 +232,25 @@ function renderMenu() {
 
     if (currentFilteredMenu.length === 0) {
         container.innerHTML = '<p class="loading">ไม่พบรายการเมนู</p>';
+        return;
+    }
+
+    if (menuViewMode === 'list') {
+        container.innerHTML = currentFilteredMenu.map((item, index) => {
+            let priceText = `${item.Price} บาท`;
+            if (item.Price && String(item.Price).includes('/')) {
+                priceText = `${String(item.Price).split('/')[0].trim()} บาท`;
+            }
+
+            return `
+                <button type="button" class="menu-list-item" onclick="openProductModal(${index})">
+                    <i class="fas fa-glass-water" aria-hidden="true"></i>
+                    <span class="menu-list-name">${item.Name}</span>
+                    ${(item.Recommended && item.Recommended.trim().toLowerCase() !== 'no' && item.Recommended.trim() !== '') ? '<span class="menu-recommended-badge">แนะนำ</span>' : ''}
+                    <span class="menu-list-price">${priceText}</span>
+                </button>
+            `;
+        }).join('');
         return;
     }
 

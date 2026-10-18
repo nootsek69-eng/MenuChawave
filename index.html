@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
     <header class="app-header">
@@ -27,6 +27,15 @@
                 <select id="category-select" class="category-select" onchange="filterCategory(this.value)">
                     <!-- Options will be injected here -->
                 </select>
+            </div>
+
+            <div class="menu-view-toggle" role="group" aria-label="มุมมองเมนู">
+                <button type="button" class="menu-view-button active" id="list-view-button" aria-label="มุมมองรายการ" aria-pressed="true" onclick="setMenuView('list')" title="มุมมองรายการ">
+                    <i class="fas fa-list" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="menu-view-button" id="card-view-button" aria-label="มุมมองการ์ด" aria-pressed="false" onclick="setMenuView('cards')" title="มุมมองการ์ด">
+                    <i class="fas fa-grip" aria-hidden="true"></i>
+                </button>
             </div>
             
             <div class="search-wrapper" id="search-wrapper">
@@ -247,6 +256,6 @@
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=33"></script>
+    <script src="script.js?v=34"></script>
 </body>
 </html>
