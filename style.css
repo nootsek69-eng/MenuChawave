@@ -61,6 +61,23 @@ body::before {
     pointer-events: none;
 }
 
+body::after {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        url("Logo_halloween.svg"),
+        url("Logo_halloween.svg"),
+        url("Logo_halloween.svg"),
+        url("Logo_halloween.svg");
+    background-repeat: no-repeat;
+    background-position: 7% 22%, 92% 34%, 13% 76%, 84% 88%;
+    background-size: 92px auto, 68px auto, 118px auto, 76px auto;
+    content: "";
+    opacity: 0.1;
+    pointer-events: none;
+}
+
 /* Header */
 .app-header {
     position: relative;
@@ -1170,12 +1187,58 @@ textarea:focus {
     body::before {
         background-image:
             url("halloween-background-mobile.svg"),
-            radial-gradient(ellipse at 8% 4%, rgba(232, 120, 0, 0.2), transparent 38%),
-            radial-gradient(ellipse at 92% 18%, rgba(104, 55, 84, 0.2), transparent 34%),
-            radial-gradient(ellipse at 70% 100%, rgba(188, 79, 0, 0.16), transparent 40%),
-            linear-gradient(135deg, #120F0D 0%, #191316 52%, #17110D 100%);
+            radial-gradient(ellipse at 8% 12%, rgba(232, 120, 0, 0.13), transparent 42%),
+            radial-gradient(ellipse at 94% 56%, rgba(104, 55, 84, 0.07), transparent 40%),
+            linear-gradient(160deg, #100D0B 0%, #17110F 54%, #100D0B 100%);
         background-position: center;
         background-size: cover;
+    }
+
+    body::after {
+        background-position: 8% 24%, 92% 43%, 13% 73%, 88% 88%;
+        background-size: 78px auto, 112px auto, 66px auto, 88px auto;
+        opacity: 0.09;
+    }
+
+    .halloween-ghost {
+        top: auto;
+        right: 15px;
+        bottom: calc(122px + env(safe-area-inset-bottom));
+        z-index: 99;
+        width: 40px;
+        height: 52px;
+        opacity: 0.62;
+        filter: drop-shadow(0 0 7px rgba(232, 120, 0, 0.35));
+    }
+
+    .ambient-audio-toggle {
+        top: auto;
+        right: 15px;
+        bottom: calc(70px + env(safe-area-inset-bottom));
+        z-index: 99;
+        width: 38px;
+        height: 38px;
+    }
+
+    .ghost-audio-status {
+        top: auto;
+        right: 62px;
+        bottom: calc(132px + env(safe-area-inset-bottom));
+        z-index: 99;
+    }
+
+    .ghost-scare {
+        padding:
+            max(1rem, env(safe-area-inset-top))
+            max(1rem, env(safe-area-inset-right))
+            max(1.5rem, env(safe-area-inset-bottom))
+            max(1rem, env(safe-area-inset-left));
+    }
+
+    .ghost-scare-figure {
+        width: min(70vw, 340px);
+        height: min(76vw, 400px);
+        max-height: 48dvh;
     }
 
     .cart-panel.collapsed {

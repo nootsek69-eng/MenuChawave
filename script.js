@@ -1404,7 +1404,7 @@ async function startAmbientAudio(event) {
 
     ambientAudioStarting = true;
     try {
-        audio.volume = 0.16;
+        audio.volume = 0.12;
         await audio.play();
         updateAmbientAudioButton(true);
         document.removeEventListener('pointerdown', startAmbientAudio);
@@ -1474,6 +1474,7 @@ async function showGhostScare() {
     try {
         await waitForAudioReady(audio);
         audio.currentTime = 0;
+        audio.volume = 0.58;
         await audio.play();
 
         status.classList.remove('visible');
