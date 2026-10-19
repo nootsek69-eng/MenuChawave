@@ -46,6 +46,8 @@ let currentCategory = 'All';
 let currentProduct = null;
 let editingCartIndex = -1;
 let menuViewMode = 'list';
+let ambientAudioEnabled = true;
+let ambientAudioStarting = false;
 const preloadedMenuImageUrls = new Set();
 
 // ==========================================
@@ -1380,12 +1382,144 @@ function closeStoreInfoModalOnOutsideClick(event) {
     }
 }
 
+function updateAmbientAudioButton(isPlaying) {
+    const button = document.querySelector('.ambient-audio-toggle');
+    if (!button) return;
+
+    button.setAttribute('aria-pressed', String(isPlaying));
+    button.setAttribute(
+        'aria-label',
+        isPlaying ? 'ปิดเสียงบรรยากาศฮาโลวีน' : 'เปิดเสียงบรรยากาศฮาโลวีน'
+    );
+    button.innerHTML = `<i class="fas ${isPlaying ? 'fa-volume-high' : 'fa-volume-xmark'}" aria-hidden="true"></i>`;
+}
+
+async function startAmbientAudio(event) {
+    const audio = document.getElementById('halloween-ambience-audio');
+    if (
+        event?.target instanceof Element &&
+        event.target.closest('.ambient-audio-toggle')
+    ) return;
+    if (!audio || !ambientAudioEnabled || !audio.paused || ambientAudioStarting) return;
+
+    ambientAudioStarting = true;
+    try {
+        audio.volume = 0.16;
+        await audio.play();
+        updateAmbientAudioButton(true);
+        document.removeEventListener('pointerdown', startAmbientAudio);
+        document.removeEventListener('keydown', startAmbientAudio);
+    } catch (error) {
+        console.warn('Halloween ambience could not be played yet.', error);
+    } finally {
+        ambientAudioStarting = false;
+    }
+}
+
+async function toggleAmbientAudio() {
+    const audio = document.getElementById('halloween-ambience-audio');
+    if (!audio) return;
+
+    if (!audio.paused) {
+        ambientAudioEnabled = false;
+        audio.pause();
+        updateAmbientAudioButton(false);
+        return;
+    }
+
+    ambientAudioEnabled = true;
+    await startAmbientAudio();
+}
+
+function waitForAudioReady(audio) {
+    if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+        return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+        const cleanup = () => {
+            audio.removeEventListener('canplaythrough', onCanPlayThrough);
+            audio.removeEventListener('error', onError);
+        };
+        const onCanPlayThrough = () => {
+            cleanup();
+            resolve();
+        };
+        const onError = () => {
+            cleanup();
+            reject(audio.error || new Error('Unable to load Halloween scare audio.'));
+        };
+
+        audio.addEventListener('canplaythrough', onCanPlayThrough);
+        audio.addEventListener('error', onError);
+        audio.load();
+    });
+}
+
+async function showGhostScare() {
+    const scare = document.getElementById('ghost-scare');
+    const audio = document.getElementById('ghost-scare-audio');
+    const closeButton = scare?.querySelector('.ghost-scare-close');
+    const ghostButton = document.querySelector('.halloween-ghost');
+    const status = document.getElementById('ghost-audio-status');
+    if (!scare || !audio || !closeButton || !ghostButton || !status) return;
+
+    if (scare.classList.contains('active') || ghostButton.disabled) return;
+
+    ghostButton.disabled = true;
+    ghostButton.setAttribute('aria-label', 'กำลังโหลดเสียงผี');
+    status.textContent = 'กำลังโหลดเสียง...';
+    status.classList.add('visible');
+
+    try {
+        await waitForAudioReady(audio);
+        audio.currentTime = 0;
+        await audio.play();
+
+        status.classList.remove('visible');
+        status.textContent = '';
+        scare.classList.add('active');
+        scare.setAttribute('aria-hidden', 'false');
+        closeButton.focus();
+    } catch (error) {
+        console.error('Halloween scare audio could not be played.', error);
+        status.textContent = 'โหลดเสียงไม่สำเร็จ';
+        ghostButton.setAttribute('aria-label', 'เสียงโหลดไม่สำเร็จ แตะเพื่อลองอีกครั้ง');
+    } finally {
+        ghostButton.disabled = false;
+    }
+}
+
+function closeGhostScare() {
+    const scare = document.getElementById('ghost-scare');
+    const audio = document.getElementById('ghost-scare-audio');
+    const ghostButton = document.querySelector('.halloween-ghost');
+    if (!scare?.classList.contains('active')) return;
+
+    audio?.pause();
+    if (audio) audio.currentTime = 0;
+    scare.classList.remove('active');
+    scare.setAttribute('aria-hidden', 'true');
+    ghostButton?.setAttribute('aria-label', 'แตะเพื่อปลุกผี');
+    ghostButton?.focus();
+}
+
 function startApp() {
     // แจ้งเตือนก่อนเริ่มงานตั้งค่าอื่น ๆ
     checkSundayAlert();
 
     initApp();
     renderCart(); // โหลดตะกร้าที่บันทึกไว้
+
+    document.querySelector('.halloween-ghost')?.addEventListener('click', showGhostScare);
+    document.querySelector('.ambient-audio-toggle')?.addEventListener('click', toggleAmbientAudio);
+    document.addEventListener('pointerdown', startAmbientAudio);
+    document.addEventListener('keydown', startAmbientAudio);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeGhostScare();
+        }
+    });
 
     // ซิงค์สถานะตัวย่อตะกร้ากับ body สำหรับการจัด layout บนคอม
     const cartPanel = document.getElementById('cart-panel');
