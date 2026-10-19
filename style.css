@@ -28,8 +28,25 @@
     box-sizing: border-box;
 }
 
+html {
+    background-color: var(--bg-color);
+}
+
 body {
+    position: relative;
+    isolation: isolate;
     font-family: 'Prompt', sans-serif;
+    background-color: transparent;
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 80px; /* Space for bottom cart */
+}
+
+body::before {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     background-color: var(--bg-color);
     background-image:
         url("halloween-background.svg"),
@@ -40,11 +57,8 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    background-attachment: fixed;
-    color: var(--text-main);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    padding-bottom: 80px; /* Space for bottom cart */
+    content: "";
+    pointer-events: none;
 }
 
 /* Header */
@@ -1153,7 +1167,7 @@ textarea:focus {
 }
 
 @media (max-width: 767px) {
-    body {
+    body::before {
         background-image:
             url("halloween-background-mobile.svg"),
             radial-gradient(ellipse at 8% 4%, rgba(232, 120, 0, 0.2), transparent 38%),
