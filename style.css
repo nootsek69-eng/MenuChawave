@@ -1153,6 +1153,17 @@ textarea:focus {
 }
 
 @media (max-width: 767px) {
+    body {
+        background-image:
+            url("halloween-background-mobile.svg"),
+            radial-gradient(ellipse at 8% 4%, rgba(232, 120, 0, 0.2), transparent 38%),
+            radial-gradient(ellipse at 92% 18%, rgba(104, 55, 84, 0.2), transparent 34%),
+            radial-gradient(ellipse at 70% 100%, rgba(188, 79, 0, 0.16), transparent 40%),
+            linear-gradient(135deg, #120F0D 0%, #191316 52%, #17110D 100%);
+        background-position: center;
+        background-size: cover;
+    }
+
     .cart-panel.collapsed {
         transform: translateY(calc(100% - 56px));
     }
