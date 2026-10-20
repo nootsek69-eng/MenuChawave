@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
     <header class="app-header">
@@ -30,8 +30,8 @@
         <i class="fas fa-volume-xmark" aria-hidden="true"></i>
     </button>
     <span class="ghost-audio-status" id="ghost-audio-status" role="status" aria-live="polite"></span>
-    <audio id="halloween-ambience-audio" src="halloween-ambience.mp3" loop preload="auto"></audio>
-    <audio id="ghost-scare-audio" src="halloween-scare.mp3" preload="auto"></audio>
+    <audio id="halloween-ambience-audio" src="halloween-ambience.mp3" loop preload="none"></audio>
+    <audio id="ghost-scare-audio" src="halloween-scare.mp3" preload="none"></audio>
 
     <div class="ghost-scare" id="ghost-scare" role="dialog" aria-modal="true" aria-label="คืนหลอนวันฮาโลวีน" aria-hidden="true" onclick="closeGhostScare()">
         <button type="button" class="ghost-scare-close" onclick="closeGhostScare()" aria-label="หนีกลับไปก่อน">×</button>
@@ -293,6 +293,6 @@
 
     <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js?v=39"></script>
+    <script src="script.js?v=40"></script>
 </body>
 </html>

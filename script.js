@@ -6,6 +6,7 @@
 // 3. เลือกแผ่นงานที่ต้องการ และเลือกรูปแบบเป็น "ค่าที่คั่นด้วยจุลภาค (.csv)"
 // 4. นำลิงก์ที่ได้มาวางในตัวแปรด้านล่างนี้
 const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7NsP46-2fr6vidSjW2BO6YGkKgdhUXlxuqEBNqpcJ4jrqE9roD-KILJXBa1EHZEDkXhhw5Q8NodZR/pub?gid=0&single=true&output=csv";
+const MENU_CACHE_KEY = 'chawave_menu_cache';
 
 // ==========================================
 // ลิงก์ Google Apps Script สำหรับรับออเดอร์เข้า POS
@@ -48,26 +49,40 @@ let editingCartIndex = -1;
 let menuViewMode = 'list';
 let ambientAudioEnabled = true;
 let ambientAudioStarting = false;
-const preloadedMenuImageUrls = new Set();
 
 // ==========================================
 // การดึงข้อมูล (Fetch Data)
 // ==========================================
 async function initApp() {
+    let hasCachedMenu = false;
+
+    try {
+        const cachedMenu = localStorage.getItem(MENU_CACHE_KEY);
+        if (cachedMenu) {
+            const cachedItems = JSON.parse(cachedMenu);
+            if (Array.isArray(cachedItems) && cachedItems.length > 0 &&
+                cachedItems.every(item => item && typeof item.Name === 'string' && item.Name.trim())) {
+                setMenuData(cachedItems);
+                hasCachedMenu = true;
+            } else {
+                console.warn('Cached menu data is invalid; loading fresh data.');
+            }
+        }
+    } catch (error) {
+        console.warn('Unable to read cached menu data.', error);
+    }
+
     try {
         let csvString = "";
-
         if (GOOGLE_SHEETS_CSV_URL) {
             try {
-                // Try fetching directly first
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL + "&t=" + new Date().getTime());
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
                 if (!response.ok) throw new Error("Network response was not ok");
                 csvString = await response.text();
             } catch (err) {
                 console.warn("Direct fetch failed (CORS issue), trying proxy...", err);
                 try {
-                    // Fallback to corsproxy.io
-                    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(GOOGLE_SHEETS_CSV_URL + "&t=" + new Date().getTime());
+                    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(GOOGLE_SHEETS_CSV_URL);
                     const response = await fetch(proxyUrl);
                     if (!response.ok) throw new Error("Proxy failed");
                     csvString = await response.text();
@@ -79,72 +94,53 @@ async function initApp() {
             throw new Error("ไม่มีลิงก์ Google Sheets");
         }
 
-        // แปลง CSV เป็น JSON
-        Papa.parse(csvString, {
-            header: true,
-            skipEmptyLines: true,
-            complete: function (results) {
-                menuData = results.data.filter(item => item.Name && item.Name.trim() !== '');
-                // Sanitize existing cart items if any had unwanted sauce/addons from old bug
-                if (cart && cart.length > 0) {
-                    let changed = false;
-                    cart.forEach(c => {
-                        const base = menuData.find(m => m.Name === c.Name);
-                        if (base) {
-                            if (!base.Sauce && c.selectedSauce && c.selectedSauce.length > 0) {
-                                c.selectedSauce = [];
-                                changed = true;
-                            }
-                            if (!base.Addons && c.selectedAddons && c.selectedAddons.length > 0) {
-                                c.selectedAddons = [];
-                                changed = true;
-                            }
-                        }
-                    });
-                    if (changed) {
-                        renderCart();
-                    }
-                }
-                renderCategories();
-                renderMenu();
-                preloadMenuImages(menuData);
-            }
-        });
+        const results = Papa.parse(csvString, { header: true, skipEmptyLines: true });
+        const freshMenu = results.data.filter(item => item.Name && item.Name.trim() !== '');
+        if (freshMenu.length === 0) {
+            throw new Error('The menu data is empty or invalid.');
+        }
+
+        setMenuData(freshMenu);
+        try {
+            localStorage.setItem(MENU_CACHE_KEY, JSON.stringify(freshMenu));
+        } catch (error) {
+            console.warn('Unable to cache menu data.', error);
+        }
     } catch (error) {
-        console.error("Error fetching data:", error);
-        document.getElementById('menu-container').innerHTML = '<p class="loading">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+        if (hasCachedMenu) {
+            console.warn('Unable to refresh menu data; showing cached menu.', error);
+        } else {
+            console.error("Error fetching data:", error);
+            document.getElementById('menu-container').innerHTML = '<p class="loading">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+        }
     }
 }
 
-function preloadMenuImages(items) {
-    const imageUrls = [...new Set(items
-        .map(item => item.Image && item.Image.trim())
-        .filter(Boolean))]
-        .filter(url => !preloadedMenuImageUrls.has(url));
-    let nextIndex = 0;
-    let activeLoads = 0;
-    const maxConcurrentLoads = 3;
+function setMenuData(items) {
+    menuData = items;
 
-    function loadNextImage() {
-        while (activeLoads < maxConcurrentLoads && nextIndex < imageUrls.length) {
-            const imageUrl = imageUrls[nextIndex++];
-            preloadedMenuImageUrls.add(imageUrl);
-            activeLoads++;
-
-            const image = new Image();
-            image.decoding = 'async';
-            image.fetchPriority = 'low';
-            image.onload = image.onerror = () => {
-                activeLoads--;
-                loadNextImage();
-            };
-            image.src = imageUrl;
+    if (cart && cart.length > 0) {
+        let changed = false;
+        cart.forEach(item => {
+            const base = menuData.find(menuItem => menuItem.Name === item.Name);
+            if (base) {
+                if (!base.Sauce && item.selectedSauce && item.selectedSauce.length > 0) {
+                    item.selectedSauce = [];
+                    changed = true;
+                }
+                if (!base.Addons && item.selectedAddons && item.selectedAddons.length > 0) {
+                    item.selectedAddons = [];
+                    changed = true;
+                }
+            }
+        });
+        if (changed) {
+            renderCart();
         }
     }
 
-    if (imageUrls.length > 0) {
-        window.setTimeout(loadNextImage, 150);
-    }
+    renderCategories();
+    renderMenu();
 }
 
 // ==========================================

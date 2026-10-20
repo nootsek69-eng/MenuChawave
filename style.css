@@ -1356,8 +1356,7 @@ textarea:focus {
     color: var(--primary);
 }
 .remove-btn, .edit-btn {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 0.78rem;
@@ -1368,16 +1367,27 @@ textarea:focus {
     transition: var(--transition);
 }
 .remove-btn {
-    color: #EF4444;
+    background: #171310;
+    border-color: var(--primary-dark);
+    color: var(--primary-light);
 }
 .edit-btn {
-    color: #3B82F6;
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #1A1008;
 }
 .remove-btn:hover {
-    background: #FEE2E2;
+    background: var(--primary-dark);
+    border-color: var(--primary);
+    color: #FFF7ED;
 }
 .edit-btn:hover {
-    background: #DBEAFE;
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+}
+.remove-btn:focus-visible, .edit-btn:focus-visible {
+    outline: 2px solid var(--primary-light);
+    outline-offset: 2px;
 }
 
 .cart-footer {
@@ -1551,15 +1561,15 @@ textarea:focus {
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
-    background: #06C755;
-    color: white;
-    box-shadow: 0 4px 12px rgba(6, 199, 85, 0.3);
+    background: var(--primary);
+    color: #1A1008;
+    box-shadow: 0 4px 12px rgba(232, 120, 0, 0.3);
     transition: all 0.25s ease;
 }
 .checkout-btn:hover {
-    background: #05a546;
+    background: var(--primary-light);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(6, 199, 85, 0.4);
+    box-shadow: 0 6px 16px rgba(232, 120, 0, 0.4);
 }
 .checkout-btn:disabled {
     background: var(--border-color);
