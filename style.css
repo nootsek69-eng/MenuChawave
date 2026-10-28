@@ -234,17 +234,12 @@ body::after {
 
 .ghost-scare-figure {
     position: relative;
+    display: block;
     width: min(64vw, 390px);
     height: min(76vw, 460px);
     max-height: 58vh;
-    border-radius: 48% 48% 18% 18% / 38% 38% 18% 18%;
-    background:
-        radial-gradient(ellipse at 35% 39%, #140909 0 5%, transparent 5.8%),
-        radial-gradient(ellipse at 65% 39%, #140909 0 5%, transparent 5.8%),
-        radial-gradient(ellipse at 50% 58%, #140909 0 9%, transparent 9.8%),
-        linear-gradient(180deg, #FFF8EE 0%, #D9C7B5 68%, #8F6B56 100%);
-    box-shadow: 0 0 65px rgba(232, 120, 0, 0.32), inset 0 -28px 45px rgba(39, 16, 13, 0.45);
-    clip-path: polygon(50% 0, 79% 8%, 96% 31%, 100% 100%, 83% 89%, 68% 100%, 51% 89%, 33% 100%, 17% 89%, 0 100%, 4% 31%, 21% 8%);
+    object-fit: contain;
+    filter: drop-shadow(0 0 28px rgba(232, 120, 0, 0.4));
     transform: scale(0.12) rotate(-8deg);
 }
 
