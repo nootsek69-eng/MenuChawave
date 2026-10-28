@@ -46,7 +46,7 @@ let favorites = JSON.parse(localStorage.getItem('chawave_favorites')) || [];
 let currentCategory = 'All';
 let currentProduct = null;
 let editingCartIndex = -1;
-let menuViewMode = 'list';
+let menuViewMode = 'cards';
 let ambientAudioEnabled = true;
 let ambientAudioStarting = false;
 
