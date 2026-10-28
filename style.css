@@ -1238,7 +1238,7 @@ textarea:focus {
     .halloween-ghost {
         top: auto;
         right: 15px;
-        bottom: calc(122px + env(safe-area-inset-bottom));
+        bottom: calc(200px + env(safe-area-inset-bottom));
         z-index: 99;
         width: 40px;
         height: 52px;
